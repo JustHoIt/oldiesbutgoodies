@@ -1,5 +1,6 @@
 package com.hm.oldiesbutgoodies.entity;
 
+import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,7 +36,7 @@ public class User {
 
     private String address;
     private String profileImg;
-    private String birth_date;
+    private String birthDate;
     private String gender;
     private String socialLoginType;
     private String status;
@@ -52,4 +53,20 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 
+    public static User fro(SignUpDto dto) {
+        return User.builder()
+                .email(dto.getEmail())
+                .password(dto.getPassword())
+                .nickname(dto.getNickname())
+                .role("")
+                .phoneNumber(dto.getPhoneNumber())
+                .address(dto.getAddress())
+                .profileImg(dto.getProfileImg())
+                .birthDate(dto.getBirthDate())
+                .gender(dto.getGender())
+                .socialLoginType("NONE")
+                .status("")
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 }
