@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    hikari:
+      driver-class-name: com.mysql.jdbc.Driver
+      username: ${db.username}
+      password: ${db.password}
+      jdbc-url: ${url}
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
