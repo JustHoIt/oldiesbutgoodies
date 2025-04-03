@@ -25,6 +25,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private String name;
+
     @Column(nullable = false, unique = true)
     private String nickname;
 
@@ -53,10 +56,11 @@ public class User {
         this.updatedAt = LocalDateTime.now();
     }
 
-    public static User fro(SignUpDto dto) {
+    public static User from(SignUpDto dto) {
         return User.builder()
                 .email(dto.getEmail())
                 .password(dto.getPassword())
+                .name(dto.getName())
                 .nickname(dto.getNickname())
                 .role("")
                 .phoneNumber(dto.getPhoneNumber())
