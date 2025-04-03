@@ -13,3 +13,9 @@ spring:
         format-sql: true
     hibernate:
       ddl-auto: create-drop
+
+
+redis:
+  host: ${rds.host}
+  port: ${rds.port}
+  password: ${rds.pwd}
