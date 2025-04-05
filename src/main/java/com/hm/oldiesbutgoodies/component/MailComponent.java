@@ -5,6 +5,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MailComponent {
 
+    @Value("${spring.mail.username}")
+    private String from;
     private final JavaMailSender mailSender;
 
     public void sendMail(MailDto mailDto) throws MessagingException {
@@ -42,14 +45,14 @@ public class MailComponent {
             mailSender.send(msg);
             log.info("메일 전송에 성공했습니다.");
         } catch (MailException e) {
-            log.error("메일 전송에 실해했습니다. {} ", e.getMessage());
+            log.error("메일 전송에 실패했습니다. {} ", e.getMessage());
         }
     }
 
     public void signUpSend(String code, String email) throws MessagingException {
         MailDto mailDto = MailDto.builder()
                 .to(email)
-                .from("Oldies But Goodies")
+                .from(from)
                 .subject("OldiesButGoodies - 이메일 인증 ")
                 .text("<H1>Oldies But Goodies 이메일 인증 코드입니다.</H1>" +
                         "</br>" +

@@ -26,6 +26,7 @@ public class MailService {
         }
 
         String code = randomCode();
+        log.info("Email Code: {}", code);
 
         mailComponent.signUpSend(code, email);
 
