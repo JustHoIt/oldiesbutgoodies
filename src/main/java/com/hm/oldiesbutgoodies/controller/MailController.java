@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController("/v1")
 @RequiredArgsConstructor
 @Slf4j
-public class EmailController {
+public class MailController {
 
     private final MailService mailService;
 

@@ -33,17 +33,17 @@ public class MailComponent {
                 mimeMessageHelper.setTo(mailDto.getTo());
                 mimeMessageHelper.setFrom(mailDto.getFrom());
                 mimeMessageHelper.setSubject(mailDto.getSubject());
-                mimeMessageHelper.setText(mailDto.getText());
+                mimeMessageHelper.setText(mailDto.getText(), true);
             }
         };
 
-        sendResult(msg);
+        sendResult(msg, mailDto.getTo());
     }
 
-    public void sendResult(MimeMessagePreparator msg) throws MailException {
+    public void sendResult(MimeMessagePreparator msg, String email) throws MailException {
         try {
             mailSender.send(msg);
-            log.info("메일 전송에 성공했습니다.");
+            log.info("메일 전송에 성공했습니다. To : {}", email);
         } catch (MailException e) {
             log.error("메일 전송에 실패했습니다. {} ", e.getMessage());
         }
@@ -56,12 +56,11 @@ public class MailComponent {
                 .subject("OldiesButGoodies - 이메일 인증 ")
                 .text("<H1>Oldies But Goodies 이메일 인증 코드입니다.</H1>" +
                         "</br>" +
-                        "인증번호 : " + code +
+                        "인증번호 :  [<strong> " + code + "</strong> ]" +
                         "</br>" +
-                        "회원가입 창으로 돌아가 위 6자리 코드를 입력해주세요.")
+                        " 회원가입 창으로 돌아가 위 6자리 코드를 입력해주세요.")
                 .build();
 
-        log.info("이메일 인증 메일 발송완료 To : {}", email);
 
         sendMail(mailDto);
     }
