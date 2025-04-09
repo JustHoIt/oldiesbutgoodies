@@ -1,7 +1,9 @@
 package com.hm.oldiesbutgoodies.service;
 
+import com.hm.oldiesbutgoodies.component.RedisComponent;
 import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
+import com.hm.oldiesbutgoodies.entity.MailAuth;
 import com.hm.oldiesbutgoodies.entity.User;
 import com.hm.oldiesbutgoodies.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,8 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final RedisComponent redisComponent;
+
 
     public ResponseDto signUp(SignUpDto dto) {
 
@@ -48,5 +52,26 @@ public class UserService {
 
         log.info("{}님이 회원가입에 완료했습니다.", dto.getName());
         return result;
+    }
+
+    public ResponseDto emailCheck(String email, String code) {
+        MailAuth mailAuth = (MailAuth) redisComponent.get(email);
+        ResponseDto result = new ResponseDto();
+        if(!mailAuth.getCode().equals(code)){
+            log.info("mailAuthCode: {}, code : {} ", mailAuth.getCode(), code);
+            result.setMessage("이메일 인증코드가 일치하지 않습니다.");
+            return result;
+        }
+
+        if (mailAuth == null) {
+            log.info("이메일 인증 코드가 존재하지 않음");
+            result.setMessage("이메일 인증코드가 존재하지 않거나, 유효기간이 만료되었습니다.");
+            return result;
+        } else {
+            log.info("이메일 인증 체크 완료 : {}, code : {}", email, mailAuth.getCode());
+            result.setMessage("이메일 인증 체크 완료");
+            redisComponent.delete(email);
+            return result;
+        }
     }
 }
