@@ -62,7 +62,7 @@ public class User {
                 .password(dto.getPassword())
                 .name(dto.getName())
                 .nickname(dto.getNickname())
-                .role("")
+                .role("ROLE_USER")
                 .phoneNumber(dto.getPhoneNumber())
                 .address(dto.getAddress())
                 .profileImg(dto.getProfileImg())

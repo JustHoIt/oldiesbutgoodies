@@ -38,3 +38,7 @@ spring:
         max-active: 10
         max-idle: 5
         min-idle: 1
+
+jwt:
+  secret: ${jwt_secret}
+  expiration: 3600000

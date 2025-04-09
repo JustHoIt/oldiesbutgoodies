@@ -1,6 +1,7 @@
 package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.component.RedisComponent;
+import com.hm.oldiesbutgoodies.dto.request.LoginRequest;
 import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.entity.MailAuth;
@@ -9,8 +10,11 @@ import com.hm.oldiesbutgoodies.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.login.LoginException;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -20,8 +24,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RedisComponent redisComponent;
+    private final PasswordEncoder passwordEncoder;
 
 
+    // 회원가입
     public ResponseDto signUp(SignUpDto dto) {
 
         if (this.userRepository.existsByEmail(dto.getEmail())) {
@@ -54,6 +60,7 @@ public class UserService {
         return result;
     }
 
+    // 이메일 인증 체크
     public ResponseDto emailCheck(String email, String code) {
         MailAuth mailAuth = (MailAuth) redisComponent.get(email);
         ResponseDto result = new ResponseDto();
@@ -73,5 +80,27 @@ public class UserService {
             redisComponent.delete(email);
             return result;
         }
+    }
+
+    // 로그인
+    public User authenticate(LoginRequest form) throws Exception {
+
+        Optional<User> optionalUser = userRepository.findByEmail(form.getId());
+
+        if(optionalUser.isEmpty()) {
+            throw new Exception("NOT_MATCH_USER");
+        }
+
+        User user = optionalUser.get();
+
+        if(!this.passwordEncoder.matches(form.getPassword(), user.getPassword())) {
+            throw new Exception("비밀번호가 일치하지 않습니다.");
+        }
+
+        if(user.getStatus().equals("ACTIVE")) {
+            throw new Exception("회원이 이용 가능한 상태가 아닙니다.");
+        }
+
+        return user;
     }
 }
