@@ -4,6 +4,7 @@ import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -39,7 +40,7 @@ public class User {
 
     private String address;
     private String profileImg;
-    private String birthDate;
+    private LocalDate birthDate;
     private String gender;
     private String socialLoginType;
     private String status;
@@ -66,7 +67,7 @@ public class User {
                 .phoneNumber(dto.getPhoneNumber())
                 .address(dto.getAddress())
                 .profileImg(dto.getProfileImg())
-                .birthDate(dto.getBirthDate())
+                .birthDate(LocalDate.parse(dto.getBirthDate()))
                 .gender(dto.getGender())
                 .socialLoginType("NONE")
                 .status("")

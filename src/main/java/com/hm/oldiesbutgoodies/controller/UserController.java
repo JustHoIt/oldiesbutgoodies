@@ -2,7 +2,9 @@ package com.hm.oldiesbutgoodies.controller;
 
 import com.hm.oldiesbutgoodies.auth.JwtProvider;
 import com.hm.oldiesbutgoodies.dto.request.LoginRequest;
+import com.hm.oldiesbutgoodies.dto.request.OtherUserDto;
 import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
+import com.hm.oldiesbutgoodies.dto.request.UserDto;
 import com.hm.oldiesbutgoodies.dto.response.JwtResponse;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.entity.User;
@@ -42,6 +44,19 @@ public class UserController {
         JwtResponse jwtResponse = jwtProvider.generateToken(user.getEmail(), user.getRole());
         log.info("{}님이 로그인에 성공했습니다. token : {}", user.getName(), jwtResponse.getToken());
         return ResponseEntity.ok(jwtResponse);
+    }
+
+    @GetMapping(value = "/getUser",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserDto> getUser(@RequestHeader("Authorization")String token) {
+        String email = jwtProvider.getUsername(token);
+        return ResponseEntity.ok(userService.getUserInfo(email));
+    }
+
+    @GetMapping(value = "/getOtherUser",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<OtherUserDto> getOtherUserInfo(@RequestParam("email")String email) {
+        return ResponseEntity.ok(userService.getOtherUserInfo(email));
     }
 
 }

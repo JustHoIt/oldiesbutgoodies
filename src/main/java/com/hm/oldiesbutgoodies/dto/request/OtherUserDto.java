@@ -11,34 +11,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserDto {
+public class OtherUserDto {
     private String email;
-    private String name;
     private String nickname;
-    private String role;
     private String profileImg;
     private String phoneNumber;
-    private String address;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDate birthDate;
-    private String socialLoginType;
-    private String gender;
 
-    public static UserDto getUser(User user) {
-        return UserDto.builder()
+
+    public static OtherUserDto getUser(User user) {
+        return OtherUserDto.builder()
                 .email(user.getEmail())
-                .name(user.getName())
                 .nickname(user.getNickname())
-                .role(user.getRole())
                 .profileImg(user.getProfileImg())
                 .phoneNumber(user.getPhoneNumber())
-                .address(user.getAddress())
                 .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
-                .birthDate(user.getBirthDate())
-                .socialLoginType(user.getSocialLoginType())
-                .gender(user.getGender())
                 .build();
     }
 }
