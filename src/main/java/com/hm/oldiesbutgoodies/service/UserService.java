@@ -64,7 +64,8 @@ public class UserService {
     public ResponseDto emailCheck(String email, String code) {
         MailAuth mailAuth = (MailAuth) redisComponent.get(email);
         ResponseDto result = new ResponseDto();
-        if(!mailAuth.getCode().equals(code)){
+
+        if (!mailAuth.getCode().equals(code)) {
             log.info("mailAuthCode: {}, code : {} ", mailAuth.getCode(), code);
             result.setMessage("이메일 인증코드가 일치하지 않습니다.");
             return result;
@@ -85,22 +86,40 @@ public class UserService {
     // 로그인
     public User authenticate(LoginRequest form) throws Exception {
 
-        Optional<User> optionalUser = userRepository.findByEmail(form.getId());
+        Optional<User> optionalUser = findUserByLoginId(form.getId());
 
-        if(optionalUser.isEmpty()) {
+        if (optionalUser.isEmpty()) {
             throw new Exception("NOT_MATCH_USER");
         }
 
         User user = optionalUser.get();
 
-        if(!this.passwordEncoder.matches(form.getPassword(), user.getPassword())) {
+        if (!this.passwordEncoder.matches(form.getPassword(), user.getPassword())) {
             throw new Exception("비밀번호가 일치하지 않습니다.");
         }
 
-        if(user.getStatus().equals("ACTIVE")) {
+        if (user.getStatus().equals("ACTIVE")) {
             throw new Exception("회원이 이용 가능한 상태가 아닙니다.");
         }
 
         return user;
+    }
+
+    private Optional<User> findUserByLoginId(String loginId) {
+        Optional<User> optionalUser;
+
+        if (loginId.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+            optionalUser = userRepository.findByEmail(loginId);
+            /*일치하지 않을때 오류 넣기*/
+            log.info("{}님이 이메일로 로그인했습니다.", optionalUser.get().getName());
+            return optionalUser;
+        } else if (loginId.matches("^[0-9]{10,11}$")) {
+            optionalUser = userRepository.findByPhoneNumber(loginId);
+            /*일치하지 않을때 오류 넣기*/
+            log.info("{}님이 휴대폰 번호로 로그인했습니다.", optionalUser.get().getName());
+            return optionalUser;
+        } else {
+            return Optional.empty();
+        }
     }
 }
