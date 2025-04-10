@@ -59,4 +59,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getOtherUserInfo(email));
     }
 
+
+    // ✅TODO: 회원정보 수정
+
+
+    // ✅TODO: 비밀번호 변경
 }

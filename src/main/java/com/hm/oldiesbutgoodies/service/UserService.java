@@ -31,6 +31,7 @@ public class UserService {
 
 
     // 회원가입
+    // 🚨 FIXME: 비밀번호 특수문자 없어도 가입되는 오류
     public ResponseDto signUp(SignUpDto dto) {
 
         if (this.userRepository.existsByEmail(dto.getEmail())) {
