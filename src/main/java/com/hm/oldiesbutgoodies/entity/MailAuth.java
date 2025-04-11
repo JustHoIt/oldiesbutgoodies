@@ -4,9 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.redis.core.RedisHash;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 @Entity
 @RedisHash("auth")
 @Getter

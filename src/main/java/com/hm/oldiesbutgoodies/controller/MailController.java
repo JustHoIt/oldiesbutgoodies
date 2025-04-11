@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,10 +21,16 @@ public class MailController {
 
     private final MailService mailService;
 
-    @PostMapping(value = "/signUp/mailAuth",
+    @PostMapping(value = "/users/mailAuth",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto> signUpMailAuth(@RequestParam String email) throws MessagingException {
+    public ResponseEntity<ResponseDto> signupMailAuth(@RequestParam String email) throws MessagingException {
         log.info("{} 인증 요청", email);
         return ResponseEntity.ok(mailService.signUp(email));
+    }
+
+    @PutMapping("/users/pwdReset")
+    public ResponseEntity<ResponseDto> passwordReset(@RequestParam String email, String phoneNumber) throws Exception {
+        log.info("입력받은 이메일 : {}, 휴대폰 번호 : {}", email, phoneNumber);
+        return ResponseEntity.ok(mailService.passwordReset(email, phoneNumber));
     }
 }

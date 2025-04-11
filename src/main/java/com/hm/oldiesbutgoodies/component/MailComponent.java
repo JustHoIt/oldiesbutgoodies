@@ -64,4 +64,19 @@ public class MailComponent {
 
         sendMail(mailDto);
     }
+
+    public void passwordRest(String newPwd, String email) throws MessagingException {
+        MailDto mailDto = MailDto.builder()
+                .to(email)
+                .from(from)
+                .subject("OldiesButGoodies - 임시 비밀번호 ")
+                .text("<H1>Oldies But Goodies 임시 비밀번호 입니다.</H1>" +
+                        "</br>" +
+                        "임시 비밀번호 :  [<strong> " + newPwd + "</strong> ]" +
+                        "</br>" +
+                        " 로그인 후 반드시 비밀번호를 재설정 해주세요.")
+                .build();
+
+        sendMail((mailDto));
+    }
 }

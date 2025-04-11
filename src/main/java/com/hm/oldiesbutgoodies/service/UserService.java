@@ -1,14 +1,12 @@
 package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.component.RedisComponent;
-import com.hm.oldiesbutgoodies.dto.request.LoginRequest;
-import com.hm.oldiesbutgoodies.dto.request.OtherUserDto;
-import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
-import com.hm.oldiesbutgoodies.dto.request.UserDto;
+import com.hm.oldiesbutgoodies.dto.request.*;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.entity.MailAuth;
 import com.hm.oldiesbutgoodies.entity.User;
 import com.hm.oldiesbutgoodies.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -149,4 +147,5 @@ public class UserService {
         return user.map(OtherUserDto::getUser)
                 .orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지 않습니다."));
     }
+
 }
