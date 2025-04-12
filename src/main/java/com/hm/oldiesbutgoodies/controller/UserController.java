@@ -1,10 +1,7 @@
 package com.hm.oldiesbutgoodies.controller;
 
 import com.hm.oldiesbutgoodies.auth.JwtProvider;
-import com.hm.oldiesbutgoodies.dto.request.LoginRequest;
-import com.hm.oldiesbutgoodies.dto.request.OtherUserDto;
-import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
-import com.hm.oldiesbutgoodies.dto.request.UserDto;
+import com.hm.oldiesbutgoodies.dto.request.*;
 import com.hm.oldiesbutgoodies.dto.response.JwtResponse;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.entity.User;
@@ -48,20 +45,26 @@ public class UserController {
 
     @GetMapping(value = "/getUser",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> getUser(@RequestHeader("Authorization")String token) {
+    public ResponseEntity<UserDto> getUser(@RequestHeader("Authorization") String token) {
         String email = jwtProvider.getUsername(token);
         return ResponseEntity.ok(userService.getUserInfo(email));
     }
 
     @GetMapping(value = "/getOtherUser",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<OtherUserDto> getOtherUserInfo(@RequestParam("email")String email) {
+    public ResponseEntity<OtherUserDto> getOtherUserInfo(@RequestParam("email") String email) {
         return ResponseEntity.ok(userService.getOtherUserInfo(email));
     }
 
 
     // ✅TODO: 회원정보 수정
-
+    @PutMapping(value = "/infoUpdate",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDto> userInfoUpdate(@RequestHeader("Authorization") String token,
+                                                      @RequestBody UserInfoUpdateDto dto) throws Exception {
+        String tokenInfo = jwtProvider.getUsername(token);
+        return ResponseEntity.ok(userService.userInfoUpdate(tokenInfo, dto));
+    }
 
     // ✅TODO: 비밀번호 변경
 }

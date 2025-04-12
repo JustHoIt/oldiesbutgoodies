@@ -35,7 +35,8 @@ public class SignUpDto {
     private String nickname;
 
     @NotBlank(message = "휴대폰 번호는 필수로 입력해야합니다.")
-    @Schema(description = "", example = "")
+    @Pattern(regexp = "^[0-9]{10,11}")
+    @Schema(description = "휴대폰 번호", example = "01033334444")
     private String phoneNumber;
 
     @Schema(description = "주소", example = "@@시 ##구 &&동 @@아파트 or @@빌라 $동 $호")
