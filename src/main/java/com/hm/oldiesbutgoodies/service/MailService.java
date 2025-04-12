@@ -2,7 +2,6 @@ package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.component.MailComponent;
 import com.hm.oldiesbutgoodies.component.RedisComponent;
-import com.hm.oldiesbutgoodies.dto.request.UserInfoUpdateDto;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.entity.MailAuth;
 import com.hm.oldiesbutgoodies.entity.User;

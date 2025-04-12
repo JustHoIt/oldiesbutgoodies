@@ -1,12 +1,14 @@
 package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.component.RedisComponent;
-import com.hm.oldiesbutgoodies.dto.request.*;
+import com.hm.oldiesbutgoodies.dto.request.LoginRequest;
+import com.hm.oldiesbutgoodies.dto.request.OtherUserDto;
+import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
+import com.hm.oldiesbutgoodies.dto.request.UserDto;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.entity.MailAuth;
 import com.hm.oldiesbutgoodies.entity.User;
 import com.hm.oldiesbutgoodies.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,7 +16,6 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.LoginException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public class UserService {
 
     // 회원가입
     // 🚨 FIXME: 비밀번호 특수문자 없어도 가입되는 오류
-    public ResponseDto signUp(SignUpDto dto) {
+    public ResponseDto signUp(SignUpDto dto) throws Exception {
 
         if (this.userRepository.existsByEmail(dto.getEmail())) {
             throw new RuntimeException("중복된 이메일이 존재합니다.");
@@ -48,6 +49,13 @@ public class UserService {
         }
 
         String uuid = UUID.randomUUID().toString();
+
+        boolean passwordValid = passwordValidation(dto.getPassword());
+
+        if(!passwordValid) {
+            throw new Exception("입력하신 비밀번호가 요구사항을 충족하지 않습니다.");
+        }
+
         String encPassword = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
         dto.setPassword(encPassword);
 
@@ -112,12 +120,12 @@ public class UserService {
 
         if (loginId.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             optionalUser = userRepository.findByEmail(loginId);
-            /*일치하지 않을때 오류 넣기*/
+            //TODO: 예외처리
             log.info("{}님이 이메일로 로그인했습니다.", optionalUser.get().getName());
             return optionalUser;
         } else if (loginId.matches("^[0-9]{10,11}$")) {
             optionalUser = userRepository.findByPhoneNumber(loginId);
-            /*일치하지 않을때 오류 넣기*/
+            //TODO: 예외처리
             log.info("{}님이 휴대폰 번호로 로그인했습니다.", optionalUser.get().getName());
             return optionalUser;
         } else {
@@ -129,7 +137,7 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
-            /*예외처리*/
+            //TODO: 예외처리
             return null;
         }
 
@@ -141,11 +149,35 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
-            /*예외처리*/
+            //TODO: 예외처리
         }
 
         return user.map(OtherUserDto::getUser)
                 .orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지 않습니다."));
+    }
+
+    public boolean passwordValidation(String pwd) {
+        if(pwd.length() < 8 || pwd.length() > 20 || pwd == null) {
+            return false;
+        }
+
+        boolean hasLetter = false;
+        boolean hasDigit = false;
+        boolean hasSpecialChar = false;
+
+        String specialChars = "!@#$%^&*";
+
+        for (char ch : pwd.toCharArray()) {
+            if (Character.isLetter(ch)) {
+                hasLetter = true;
+            } else if (Character.isDigit(ch)) {
+                hasDigit = true;
+            } else if (specialChars.indexOf(ch) >= 0) {
+                hasSpecialChar = true;
+            }
+        }
+
+        return hasLetter && hasDigit && hasSpecialChar;
     }
 
 }

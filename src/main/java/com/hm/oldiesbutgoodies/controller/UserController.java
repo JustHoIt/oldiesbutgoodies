@@ -27,7 +27,7 @@ public class UserController {
 
     @PostMapping(value = "/singUp",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto> signUp(@Valid @RequestBody SignUpDto dto) {
+    public ResponseEntity<ResponseDto> signUp(@Valid @RequestBody SignUpDto dto) throws Exception {
         return ResponseEntity.ok(userService.signUp(dto));
     }
 
