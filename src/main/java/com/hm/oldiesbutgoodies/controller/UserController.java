@@ -22,9 +22,9 @@ public class UserController {
     private final UserService userService;
     private final JwtProvider jwtProvider;
 
-    @PostMapping(value = "/singUp",
+    @PostMapping(value = "/signUp",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto> signUp(@Valid @RequestBody SignUpDto dto) throws Exception {
+    public ResponseEntity<ResponseDto> signUp(@Valid @RequestBody SignUpDto dto) {
         return ResponseEntity.ok(userService.signUp(dto));
     }
 
@@ -36,7 +36,7 @@ public class UserController {
 
     @PostMapping(value = "/login",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest form) throws Exception {
+    public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest form) {
         User user = userService.authenticate(form);
         JwtResponse jwtResponse = jwtProvider.generateToken(user.getEmail(), user.getRole());
         log.info("{}님이 로그인에 성공했습니다. token : {}", user.getName(), jwtResponse.getToken());
@@ -61,7 +61,7 @@ public class UserController {
     @PutMapping(value = "/infoUpdate",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> userInfoUpdate(@RequestHeader("Authorization") String token,
-                                                      @RequestBody UserInfoUpdateDto dto) throws Exception {
+                                                      @RequestBody UserInfoUpdateDto dto) {
         String tokenInfo = jwtProvider.getUsername(token);
         return ResponseEntity.ok(userService.userInfoUpdate(tokenInfo, dto));
     }

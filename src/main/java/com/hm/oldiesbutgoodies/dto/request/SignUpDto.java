@@ -18,12 +18,6 @@ public class SignUpDto {
     @Schema(description = "비밀번호", example = "password1234")
     private String password;
 
-    @NotBlank(message = "비밀번호는 필수로 입력해야합니다.")
-    @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*]{10,16}$", message = "비밀번호는 숫자, 영어(대, 소문자), 특수문자(!, @, #, $, %, ^, &, *)만 가능합니다.")
-    @Size(min = 8, max = 20, message = "비밀번호는 8자 이상, 20글자 이하입니다.")
-    @Schema(description = "비밀번호 체크", example = "password1234")
-    private String passwordCheck;
-
     @NotBlank(message = "이름은 필수로 입력해야합니다.")
     @Schema(description = "이름", example = "홍길동")
     private String name;

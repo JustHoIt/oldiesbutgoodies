@@ -5,7 +5,10 @@ import com.hm.oldiesbutgoodies.dto.request.*;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.entity.MailAuth;
 import com.hm.oldiesbutgoodies.entity.User;
+import com.hm.oldiesbutgoodies.exception.CustomException;
+import com.hm.oldiesbutgoodies.exception.ErrorCode;
 import com.hm.oldiesbutgoodies.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,30 +31,25 @@ public class UserService {
 
     // 회원가입
     // 🚨 FIXME: 비밀번호 특수문자 없어도 가입되는 오류
-    public ResponseDto signUp(SignUpDto dto) throws Exception {
+    public ResponseDto signUp(SignUpDto dto) {
 
         if (this.userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("중복된 이메일이 존재합니다.");
+            throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         if (this.userRepository.existsByPhoneNumber(dto.getPhoneNumber())) {
-            throw new RuntimeException("중복된 휴대폰 번호가 존재합니다.");
+            throw new CustomException(ErrorCode.PHONENUMBER_ALREADY_EXISTS);
         }
 
         if (this.userRepository.existsByNickname(dto.getNickname())) {
-            throw new RuntimeException("중복된 닉네임이 존재합니다.");
-        }
-
-        if (!dto.getPassword().equals(dto.getPasswordCheck())) {
-            throw new RuntimeException("입력하신 비밀번호와 비밀번호 체크가 같지않습니다.");
+            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
 
         String uuid = UUID.randomUUID().toString();
-
         boolean passwordValid = passwordValidation(dto.getPassword());
 
         if (!passwordValid) {
-            throw new Exception("입력하신 비밀번호가 요구사항을 충족하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
         }
 
         String encPassword = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
@@ -68,16 +66,15 @@ public class UserService {
         return result;
     }
 
-
-    public ResponseDto userInfoUpdate(String tokenInfo, UserInfoUpdateDto dto) throws Exception {
+    @Transactional
+    public ResponseDto userInfoUpdate(String tokenInfo, UserInfoUpdateDto dto) {
 
         if (tokenInfo == null || tokenInfo.isEmpty()) {
-            log.info(tokenInfo);
-            throw new Exception("회원정보가 존재하지 않습니다.");
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
         if (!tokenInfo.equals(dto.getEmail())) {
-            throw new Exception("토큰값의 회원정보가 요청한 회원정보의 회원이 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.MISMATCH_USER);
         }
 
 
@@ -85,13 +82,13 @@ public class UserService {
 
         if (optionalUser.isEmpty()) {
             log.info(optionalUser.get().getName());
-            throw new Exception("회원정보가 존재하지 않습니다.2");
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
         boolean passwordValid = passwordValidation(dto.getPassword());
 
         if (!passwordValid) {
-            throw new Exception("입력하신 비밀번호가 요구사항을 충족하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_FORMAT);
         }
 
         String encPassword = BCrypt.hashpw(dto.getPassword(), BCrypt.gensalt());
@@ -119,8 +116,7 @@ public class UserService {
 
         if (!mailAuth.getCode().equals(code)) {
             log.info("mailAuthCode: {}, code : {} ", mailAuth.getCode(), code);
-            result.setMessage("이메일 인증코드가 일치하지 않습니다.");
-            return result;
+            throw new CustomException(ErrorCode.EMAIL_VERIFICATION_CODE_MISMATCH);
         }
 
         if (mailAuth == null) {
@@ -136,22 +132,22 @@ public class UserService {
     }
 
     // 로그인
-    public User authenticate(LoginRequest form) throws Exception {
+    public User authenticate(LoginRequest form) {
 
         Optional<User> optionalUser = findUserByLoginId(form.getId());
 
         if (optionalUser.isEmpty()) {
-            throw new Exception("NOT_MATCH_USER");
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
         User user = optionalUser.get();
 
         if (!this.passwordEncoder.matches(form.getPassword(), user.getPassword())) {
-            throw new Exception("비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.MISMATCH_PASSWORD);
         }
 
         if (user.getStatus().equals("ACTIVE")) {
-            throw new Exception("회원이 이용 가능한 상태가 아닙니다.");
+            throw new CustomException(ErrorCode.USER_NOT_ACTIVE);
         }
 
         return user;
@@ -179,19 +175,18 @@ public class UserService {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
-            //TODO: 예외처리
-            return null;
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
         return user.map(UserDto::getUser)
-                .orElseThrow(() -> new UsernameNotFoundException("유저가 존재하지 않습니다."));
+                .orElseThrow();
     }
 
     public OtherUserDto getOtherUserInfo(String email) {
         Optional<User> user = userRepository.findByEmail(email);
 
         if (user.isEmpty()) {
-            //TODO: 예외처리
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         }
 
         return user.map(OtherUserDto::getUser)
