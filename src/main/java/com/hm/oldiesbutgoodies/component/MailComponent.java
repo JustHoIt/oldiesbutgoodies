@@ -1,7 +1,6 @@
 package com.hm.oldiesbutgoodies.component;
 
 import com.hm.oldiesbutgoodies.dto.request.MailDto;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +20,9 @@ public class MailComponent {
     private String from;
     private final JavaMailSender mailSender;
 
-    public void sendMail(MailDto mailDto) throws MessagingException {
+    public void sendMail(MailDto mailDto) {
 
         MimeMessagePreparator msg = new MimeMessagePreparator() {
-
 
             @Override
             public void prepare(MimeMessage mimeMessage) throws Exception {
@@ -40,7 +38,7 @@ public class MailComponent {
         sendResult(msg, mailDto.getTo());
     }
 
-    public void sendResult(MimeMessagePreparator msg, String email) throws MailException {
+    public void sendResult(MimeMessagePreparator msg, String email) {
         try {
             mailSender.send(msg);
             log.info("메일 전송에 성공했습니다. To : {}", email);
@@ -49,7 +47,7 @@ public class MailComponent {
         }
     }
 
-    public void signUpSend(String code, String email) throws MessagingException {
+    public void signUpSend(String code, String email) {
         MailDto mailDto = MailDto.builder()
                 .to(email)
                 .from(from)
@@ -65,7 +63,7 @@ public class MailComponent {
         sendMail(mailDto);
     }
 
-    public void passwordRest(String newPwd, String email) throws MessagingException {
+    public void passwordRest(String newPwd, String email) {
         MailDto mailDto = MailDto.builder()
                 .to(email)
                 .from(from)

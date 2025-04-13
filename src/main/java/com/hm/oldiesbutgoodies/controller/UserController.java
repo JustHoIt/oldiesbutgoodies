@@ -6,6 +6,7 @@ import com.hm.oldiesbutgoodies.dto.response.JwtResponse;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.entity.User;
 import com.hm.oldiesbutgoodies.service.UserService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -56,8 +57,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getOtherUserInfo(email));
     }
 
-
-    // ✅TODO: 회원정보 수정
     @PutMapping(value = "/infoUpdate",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> userInfoUpdate(@RequestHeader("Authorization") String token,
@@ -66,5 +65,17 @@ public class UserController {
         return ResponseEntity.ok(userService.userInfoUpdate(tokenInfo, dto));
     }
 
-    // ✅TODO: 비밀번호 변경
+    @PostMapping(value = "/users/mailAuth",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDto> signupMailAuth(@RequestParam String email) throws MessagingException {
+        log.info("{} 인증 요청", email);
+        return ResponseEntity.ok(userService.mailAuth(email));
+    }
+
+    @PutMapping("/users/pwdReset")
+    public ResponseEntity<ResponseDto> passwordReset(@RequestParam String email, String phoneNumber) throws Exception {
+        log.info("입력받은 이메일 : {}, 휴대폰 번호 : {}", email, phoneNumber);
+        return ResponseEntity.ok(userService.passwordReset(email, phoneNumber));
+    }
+
 }

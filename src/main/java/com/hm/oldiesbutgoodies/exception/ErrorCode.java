@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "", "내부 서버 오류"),
+    INPUT_VALUE_REQUIRED(HttpStatus.BAD_REQUEST, "", "값을 비워둘 수 없습니다."),
     USER_NOT_ACTIVE(HttpStatus.FORBIDDEN, "", "활동가능한 회원이 아닙니다."),
     NOT_FOUND_USER(HttpStatus.BAD_REQUEST, "", "회원정보가 존재하지 않습니다."),
     MISMATCH_USER(HttpStatus.BAD_REQUEST, "", "회원정보가 일치하지 않습니다."),
@@ -16,7 +17,10 @@ public enum ErrorCode {
     NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "", "중복된 닉네임이 존재합니다."),
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "", "비밀번호 형식이 올바르지 않습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "", "잘못된 입력입니다."),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "", "사용자를 찾을 수 없습니다.");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "", "사용자를 찾을 수 없습니다."),
+    INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "", "잘못된 코드이거나, 유호기간이 만료되었습니다.");
+
+
 
     private final HttpStatus status;
     private final String code;
