@@ -1,9 +1,9 @@
 package com.hm.oldiesbutgoodies.dto.request;
 
-import com.hm.oldiesbutgoodies.entity.User;
+import com.hm.oldiesbutgoodies.domain.user.User;
+import com.hm.oldiesbutgoodies.domain.user.UserProfile;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -19,12 +19,9 @@ public class OtherUserDto {
     private LocalDateTime createdAt;
 
 
-    public static OtherUserDto getUser(User user) {
+    public static OtherUserDto from(User user, UserProfile userProfile) {
         return OtherUserDto.builder()
-                .email(user.getEmail())
-                .nickname(user.getNickname())
-                .profileImg(user.getProfileImg())
-                .phoneNumber(user.getPhoneNumber())
+                .nickname(userProfile.getNickname())
                 .createdAt(user.getCreatedAt())
                 .build();
     }

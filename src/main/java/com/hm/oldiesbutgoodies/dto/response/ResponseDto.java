@@ -8,9 +8,11 @@ import lombok.Setter;
 public class ResponseDto {
     private String message;
 
-    public static class setMessage extends ResponseDto {
-        public setMessage(String message) {
-            super();
-        }
+    public static ResponseDto setMessage(String message) {
+        ResponseDto dto = new ResponseDto();
+        dto.message = message;
+        return dto;
     }
+
 }
+

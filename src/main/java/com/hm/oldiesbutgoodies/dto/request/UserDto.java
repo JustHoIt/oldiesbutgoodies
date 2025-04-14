@@ -1,6 +1,9 @@
 package com.hm.oldiesbutgoodies.dto.request;
 
-import com.hm.oldiesbutgoodies.entity.User;
+import com.hm.oldiesbutgoodies.domain.user.SocialLoginService;
+import com.hm.oldiesbutgoodies.domain.user.User;
+import com.hm.oldiesbutgoodies.domain.user.UserProfile;
+import com.hm.oldiesbutgoodies.domain.user.UserStatus;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -22,23 +25,25 @@ public class UserDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDate birthDate;
-    private String socialLoginType;
+    private SocialLoginService socialLoginService;
+    private UserStatus userStatus;
     private String gender;
 
-    public static UserDto getUser(User user) {
+    public static UserDto from(User user, UserProfile userProfile) {
         return UserDto.builder()
                 .email(user.getEmail())
                 .name(user.getName())
-                .nickname(user.getNickname())
+                .nickname(userProfile.getNickname())
                 .role(user.getRole())
-                .profileImg(user.getProfileImg())
+                .profileImg(userProfile.getProfileImg())
                 .phoneNumber(user.getPhoneNumber())
-                .address(user.getAddress())
+                .address(userProfile.getAddress())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
-                .birthDate(user.getBirthDate())
-                .socialLoginType(user.getSocialLoginType())
-                .gender(user.getGender())
+                .birthDate(userProfile.getBirthDate())
+                .socialLoginService(user.getSocialLoginService())
+                .userStatus(user.getStatus())
+                .gender(userProfile.getGender())
                 .build();
     }
 }

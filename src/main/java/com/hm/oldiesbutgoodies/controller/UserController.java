@@ -4,7 +4,8 @@ import com.hm.oldiesbutgoodies.auth.JwtProvider;
 import com.hm.oldiesbutgoodies.dto.request.*;
 import com.hm.oldiesbutgoodies.dto.response.JwtResponse;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
-import com.hm.oldiesbutgoodies.entity.User;
+import com.hm.oldiesbutgoodies.domain.user.User;
+import com.hm.oldiesbutgoodies.service.AuthService;
 import com.hm.oldiesbutgoodies.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -21,27 +22,35 @@ public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
+    private final AuthService authService;
     private final JwtProvider jwtProvider;
 
     @PostMapping(value = "/signUp",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> signUp(@Valid @RequestBody SignUpDto dto) {
-        return ResponseEntity.ok(userService.signUp(dto));
+        return ResponseEntity.ok(authService.signUp(dto));
     }
 
     @GetMapping(value = "/signUp/emailCheck",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> emailCheck(@RequestParam String email, String code) {
-        return ResponseEntity.ok(userService.emailCheck(email, code));
+        return ResponseEntity.ok(authService.emailCheck(email, code));
     }
 
     @PostMapping(value = "/login",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest form) {
-        User user = userService.authenticate(form);
+        User user = authService.authenticate(form);
         JwtResponse jwtResponse = jwtProvider.generateToken(user.getEmail(), user.getRole());
         log.info("{}님이 로그인에 성공했습니다. token : {}", user.getName(), jwtResponse.getToken());
         return ResponseEntity.ok(jwtResponse);
+    }
+
+    @PostMapping(value = "/users/mailAuth",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDto> signupMailAuth(@RequestParam String email) throws MessagingException {
+        log.info("{} 인증 요청", email);
+        return ResponseEntity.ok(authService.mailAuth(email));
     }
 
     @GetMapping(value = "/getUser",
@@ -63,13 +72,6 @@ public class UserController {
                                                       @RequestBody UserInfoUpdateDto dto) {
         String tokenInfo = jwtProvider.getUsername(token);
         return ResponseEntity.ok(userService.userInfoUpdate(tokenInfo, dto));
-    }
-
-    @PostMapping(value = "/users/mailAuth",
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto> signupMailAuth(@RequestParam String email) throws MessagingException {
-        log.info("{} 인증 요청", email);
-        return ResponseEntity.ok(userService.mailAuth(email));
     }
 
     @PutMapping("/users/pwdReset")
