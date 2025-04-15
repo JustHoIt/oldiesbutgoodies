@@ -5,6 +5,9 @@ import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Map;
+import java.util.UUID;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -21,25 +24,28 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     private String role;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private SocialLoginService socialLoginService;
+    private Oauth2ServiceName oauth2ServiceName;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserProfile userProfile;
+
+    public void setUserProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
+        userProfile.setUser(this);
+    }
 
     public static User from(SignUpDto dto) {
         return User.builder()
@@ -47,6 +53,18 @@ public class User extends BaseTimeEntity {
                 .phoneNumber(dto.getPhoneNumber())
                 .password(dto.getPassword())
                 .name(dto.getName())
+                .role("ROLE_USER")
+                .oauth2ServiceName(Oauth2ServiceName.NONE)
+                .status(UserStatus.ACTIVE)
+                .build();
+    }
+
+    public static User from(String email, String nickName) {
+        return User.builder()
+                .email(email)
+                .name(nickName)
+                .password(UUID.randomUUID().toString())
+                .oauth2ServiceName(Oauth2ServiceName.KAKAO)
                 .role("ROLE_USER")
                 .status(UserStatus.ACTIVE)
                 .build();

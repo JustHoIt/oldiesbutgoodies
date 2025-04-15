@@ -1,6 +1,6 @@
 package com.hm.oldiesbutgoodies.dto.request;
 
-import com.hm.oldiesbutgoodies.domain.user.SocialLoginService;
+import com.hm.oldiesbutgoodies.domain.user.Oauth2ServiceName;
 import com.hm.oldiesbutgoodies.domain.user.User;
 import com.hm.oldiesbutgoodies.domain.user.UserProfile;
 import com.hm.oldiesbutgoodies.domain.user.UserStatus;
@@ -25,7 +25,7 @@ public class UserDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDate birthDate;
-    private SocialLoginService socialLoginService;
+    private Oauth2ServiceName oauth2ServiceName;
     private UserStatus userStatus;
     private String gender;
 
@@ -41,7 +41,7 @@ public class UserDto {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .birthDate(userProfile.getBirthDate())
-                .socialLoginService(user.getSocialLoginService())
+                .oauth2ServiceName(user.getOauth2ServiceName())
                 .userStatus(user.getStatus())
                 .gender(userProfile.getGender())
                 .build();

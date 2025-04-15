@@ -1,3 +1,6 @@
+25-04-16
+1. OAuth2 카카오 로그인
+
 25-04-15
 1. User Entity분리
 2. UserServie 분리

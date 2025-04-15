@@ -2,14 +2,14 @@ package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.component.MailComponent;
 import com.hm.oldiesbutgoodies.component.RedisComponent;
-import com.hm.oldiesbutgoodies.domain.user.SocialLoginService;
+import com.hm.oldiesbutgoodies.domain.MailAuth;
+import com.hm.oldiesbutgoodies.domain.user.Oauth2ServiceName;
+import com.hm.oldiesbutgoodies.domain.user.User;
+import com.hm.oldiesbutgoodies.domain.user.UserProfile;
 import com.hm.oldiesbutgoodies.domain.user.UserStatus;
 import com.hm.oldiesbutgoodies.dto.request.LoginRequest;
 import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
-import com.hm.oldiesbutgoodies.domain.MailAuth;
-import com.hm.oldiesbutgoodies.domain.user.User;
-import com.hm.oldiesbutgoodies.domain.user.UserProfile;
 import com.hm.oldiesbutgoodies.exception.CustomException;
 import com.hm.oldiesbutgoodies.exception.ErrorCode;
 import com.hm.oldiesbutgoodies.repository.UserProfileRepository;
@@ -45,13 +45,11 @@ public class AuthService {
         validateSignUp(dto);
 
         User user = User.from(dto);
-        user.setSocialLoginService(SocialLoginService.NONE);
         user.setPassword(PasswordUtil.hashPassword(dto.getPassword()));
         UserProfile userProfile = UserProfile.from(dto);
         userProfile.setUser(user);
 
         userRepository.save(user);
-        userProfileRepository.save(userProfile);
 
 
         log.info("{}님이 회원가입에 완료했습니다.", dto.getName());
@@ -115,6 +113,10 @@ public class AuthService {
         }
 
         User user = optionalUser.get();
+
+        if(user.getOauth2ServiceName() != Oauth2ServiceName.NONE){
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
 
         if (!this.passwordEncoder.matches(form.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);

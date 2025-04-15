@@ -1,6 +1,6 @@
 package com.hm.oldiesbutgoodies.domain.user;
 
-public enum SocialLoginService {
+public enum Oauth2ServiceName {
     NONE,
     KAKAO
 }

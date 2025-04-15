@@ -2,6 +2,8 @@ package com.hm.oldiesbutgoodies.config;
 
 import com.hm.oldiesbutgoodies.auth.JwtAuthenticationFilter;
 import com.hm.oldiesbutgoodies.auth.JwtProvider;
+import com.hm.oldiesbutgoodies.component.OAuth2AuthenticationSuccessHandler;
+import com.hm.oldiesbutgoodies.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -16,9 +18,13 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final JwtProvider jwtProvider;
+    private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
-    public SecurityConfig(JwtProvider jwtProvider) {
+    public SecurityConfig(JwtProvider jwtProvider, OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler, CustomOAuth2UserService customOAuth2UserService) {
         this.jwtProvider = jwtProvider;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     @Bean
@@ -37,12 +43,20 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/swagger-resources/**",
-                                "/webjars/**").permitAll()
+                                "/webjars/**",
+                                "/v1/login",
+                                "/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
+                .oauth2Login(oauth -> oauth
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(oAuth2SuccessHandler)
+                )
                 .headers(headers -> headers
-                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable) )
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .build();
     }
 
@@ -50,4 +64,5 @@ public class SecurityConfig {
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtProvider);
     }
+
 }
