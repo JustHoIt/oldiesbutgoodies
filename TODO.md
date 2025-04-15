@@ -1,4 +1,7 @@
-2024-04-15
+2025-05-16
+1.Oauth2(카카오, 네이버, 구글?) 연결
+
+2025-04-15
 1. ~~UserEntity => UserEntity와 UserProfileEntity로 분리~~
 2. ~~User Service => UserService, AuthService로 분리~~
 
