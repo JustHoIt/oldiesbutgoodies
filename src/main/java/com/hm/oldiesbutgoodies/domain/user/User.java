@@ -5,6 +5,7 @@ import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -65,6 +66,18 @@ public class User extends BaseTimeEntity {
                 .password(UUID.randomUUID().toString())
                 .oauth2ServiceName(Oauth2ServiceName.KAKAO)
                 .role("ROLE_USER")
+                .status(UserStatus.ACTIVE)
+                .build();
+    }
+
+    public static User from(Map<String, Object> attributes) {
+        return User.builder()
+                .email((String) attributes.get("email"))
+                .phoneNumber((String) attributes.get(""))
+                .password(UUID.randomUUID().toString())
+                .name((String) attributes.get("name"))
+                .role("ROLE_USER")
+                .oauth2ServiceName(Oauth2ServiceName.NAVER)
                 .status(UserStatus.ACTIVE)
                 .build();
     }

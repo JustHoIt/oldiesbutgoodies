@@ -27,7 +27,7 @@ public class JwtProvider {
     // 토큰 발급
     public JwtResponse generateToken(String email, String role) {
         return JwtResponse.builder()
-                .token(Jwts.builder()
+                .accessToken(Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
                 .setIssuedAt(new Date())

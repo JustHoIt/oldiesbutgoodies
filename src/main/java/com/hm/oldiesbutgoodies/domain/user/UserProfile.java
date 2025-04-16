@@ -45,12 +45,22 @@ public class UserProfile extends BaseTimeEntity {
                 .build();
     }
 
-    public static UserProfile from(Map<String, Object> profile) {
+    public static UserProfile from(Map<String, Object> attributes) {
+        String birthYear = (String) attributes.getOrDefault("birthyear", null);
+        String birthday = (String) attributes.getOrDefault("birthday", null);
+        LocalDate parseBirth = null;
+
+        if (birthYear != null && birthday != null) {
+            parseBirth = LocalDate.parse(birthYear + "-" + birthday);
+        }
+
         return UserProfile.builder()
-                .nickname((String) profile.get("nickname"))
-                .profileImg((String) profile.get("profile_image"))
+                .nickname((String) attributes.getOrDefault("nickname", null))
+                .address((String) attributes.getOrDefault("address", null))
+                .profileImg((String) attributes.getOrDefault("profile_image", null))
+                .birthDate(parseBirth)
+                .gender((String) attributes.getOrDefault("gender", null))
                 .build();
     }
-
 
 }

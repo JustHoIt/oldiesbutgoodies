@@ -27,12 +27,12 @@ import java.util.Map;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
-    private final UserProfileRepository userProfileRepository;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
+        String oauth2Name = registrationId.toUpperCase();
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
@@ -62,11 +62,34 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             Map<String, Object> customAttributes = new HashMap<>(attributes);
             customAttributes.put("email", email);
             customAttributes.put("role", user.getRole());
+            customAttributes.put("service", "kakao");
 
             return new DefaultOAuth2User(authorities, customAttributes, "email");
 
-        }
+        } else if ("naver".equals(registrationId)) {
+            attributes = (Map<String, Object>) attributes.get("response");
+            String email = (String) attributes.get("email");
+            Map<String, Object> finalAttributes = attributes;
+            User user = userRepository.findByEmail(email)
+                    .orElseGet(() -> {
+                        User newUser = User.from(finalAttributes);
+                        UserProfile newUserProfile = UserProfile.from(finalAttributes);
+                        newUser.setUserProfile(newUserProfile);
 
+                        return userRepository.save(newUser);
+                    });
+
+            Collection<GrantedAuthority> authorities = List.of(
+                    new SimpleGrantedAuthority("ROLE_" + user.getRole())
+            );
+
+            Map<String, Object> customAttributes = new HashMap<>(attributes);
+            customAttributes.put("email", email);
+            customAttributes.put("role", user.getRole());
+            customAttributes.put("service", "naver");
+
+            return new DefaultOAuth2User(authorities, customAttributes, "email");
+        }
 
         return oAuth2User;
     }

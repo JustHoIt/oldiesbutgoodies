@@ -42,7 +42,7 @@ public class UserController {
     public ResponseEntity<JwtResponse> login(@RequestBody LoginRequest form) {
         User user = authService.authenticate(form);
         JwtResponse jwtResponse = jwtProvider.generateToken(user.getEmail(), user.getRole());
-        log.info("{}님이 로그인에 성공했습니다. token : {}", user.getName(), jwtResponse.getToken());
+        log.info("{}님이 로그인에 성공했습니다. token : {}", user.getName(), jwtResponse.getAccessToken());
         return ResponseEntity.ok(jwtResponse);
     }
 

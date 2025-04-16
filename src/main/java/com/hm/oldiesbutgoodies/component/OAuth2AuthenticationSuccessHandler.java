@@ -1,11 +1,11 @@
 package com.hm.oldiesbutgoodies.component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hm.oldiesbutgoodies.auth.JwtProvider;
 import com.hm.oldiesbutgoodies.dto.response.JwtResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -18,9 +18,11 @@ import java.io.IOException;
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
+    private final ObjectMapper jacksonObjectMapper;
 
-    public OAuth2AuthenticationSuccessHandler(JwtProvider jwtProvider) {
+    public OAuth2AuthenticationSuccessHandler(JwtProvider jwtProvider, ObjectMapper jacksonObjectMapper) {
         this.jwtProvider = jwtProvider;
+        this.jacksonObjectMapper = jacksonObjectMapper;
     }
 
     @Override
@@ -30,17 +32,20 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
         String role = oAuth2User.getAttribute("role");
+        String service = oAuth2User.getAttribute("service");
 
         // JWT 액세스 토큰 생성
         JwtResponse token = jwtProvider.generateToken(email, role);
-        String jwtToken = token.getToken();
 
-        log.info("이메일 : {}, role : {}, 토큰 : {}", email, role, jwtToken);
+        ObjectMapper mapper = new ObjectMapper();
+        String json = jacksonObjectMapper.writeValueAsString(token);
+
+        log.info("service: {}, email : {}, role : {}, AccessToken : {}", service, email, role, token.getAccessToken());
 
         // 클라이언트로 토큰 전송 - 예: JSON 응답으로 바로 출력
 
         response.setContentType("application/json;charset=UTF-8");
-        response.getWriter().write("{ \"accessToken\": \"" + jwtToken + "\" }");
+        response.getWriter().write(json);
         response.getWriter().flush();
     }
 }
