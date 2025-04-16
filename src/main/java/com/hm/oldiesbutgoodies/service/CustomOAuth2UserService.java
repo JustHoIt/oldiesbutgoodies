@@ -49,6 +49,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     .orElseGet(() -> {
                         User newuser = User.from(email, nickname);
                         UserProfile newUserProfile = UserProfile.from(profile);
+                        newuser.setUserProfile(newUserProfile);
 
                         return userRepository.save(newuser);
                     });

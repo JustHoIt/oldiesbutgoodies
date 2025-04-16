@@ -47,10 +47,9 @@ public class AuthService {
         User user = User.from(dto);
         user.setPassword(PasswordUtil.hashPassword(dto.getPassword()));
         UserProfile userProfile = UserProfile.from(dto);
-        userProfile.setUser(user);
+        user.setUserProfile(userProfile);
 
         userRepository.save(user);
-
 
         log.info("{}님이 회원가입에 완료했습니다.", dto.getName());
         return ResponseDto.setMessage("회원가입이 완료 됐습니다.");

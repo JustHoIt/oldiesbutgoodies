@@ -1,7 +1,7 @@
 2025-05-16
 1.Oauth2(카카오, 네이버, 구글?) 연결
-🚨 1. OAuth2 가입시 UserProfile 생성안된
-🚨 2. 회원가입(기존, OAuth2)시 createdAt, UpdatedAt 둘다 생성안됨
+🚨 1. ~~OAuth2 가입시 UserProfile 생성안된~~
+🚨 2. ~~회원가입(기존, OAuth2)시 createdAt, UpdatedAt 둘다 생성안됨~~
 
 2025-04-15
 1. ~~UserEntity => UserEntity와 UserProfileEntity로 분리~~
