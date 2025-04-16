@@ -17,6 +17,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,10 +56,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     });
 
             Collection<GrantedAuthority> authorities = List.of(
-                    new SimpleGrantedAuthority("ROLE_USER")
+                    new SimpleGrantedAuthority("ROLE_" + user.getRole())
             );
 
-            return new DefaultOAuth2User(authorities, attributes, "id");
+            Map<String, Object> customAttributes = new HashMap<>(attributes);
+            customAttributes.put("email", email);
+            customAttributes.put("role", user.getRole());
+
+            return new DefaultOAuth2User(authorities, customAttributes, "email");
 
         }
 
