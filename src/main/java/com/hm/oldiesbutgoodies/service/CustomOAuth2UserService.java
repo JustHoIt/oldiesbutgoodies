@@ -2,7 +2,6 @@ package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.domain.user.User;
 import com.hm.oldiesbutgoodies.domain.user.UserProfile;
-import com.hm.oldiesbutgoodies.repository.UserProfileRepository;
 import com.hm.oldiesbutgoodies.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -37,7 +37,7 @@ public class JwtProvider {
                 .build();
     }
 
-    public String getUsername(String token) {
+    public String getUserEmail(String token) {
 
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7); // "Bearer " 제거

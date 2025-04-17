@@ -1,4 +1,4 @@
-package com.hm.oldiesbutgoodies.dto.request;
+package com.hm.oldiesbutgoodies.dto.response;
 
 import com.hm.oldiesbutgoodies.domain.user.Oauth2ServiceName;
 import com.hm.oldiesbutgoodies.domain.user.User;

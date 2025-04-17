@@ -1,4 +1,4 @@
-package com.hm.oldiesbutgoodies.domain;
+package com.hm.oldiesbutgoodies.domain.user;
 
 import jakarta.persistence.*;
 import lombok.*;

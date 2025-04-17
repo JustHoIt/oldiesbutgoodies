@@ -2,7 +2,7 @@ package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.component.MailComponent;
 import com.hm.oldiesbutgoodies.component.RedisComponent;
-import com.hm.oldiesbutgoodies.domain.MailAuth;
+import com.hm.oldiesbutgoodies.domain.user.MailAuth;
 import com.hm.oldiesbutgoodies.domain.user.Oauth2ServiceName;
 import com.hm.oldiesbutgoodies.domain.user.User;
 import com.hm.oldiesbutgoodies.domain.user.UserProfile;

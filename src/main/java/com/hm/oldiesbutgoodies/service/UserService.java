@@ -1,8 +1,8 @@
 package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.component.MailComponent;
-import com.hm.oldiesbutgoodies.dto.request.OtherUserDto;
-import com.hm.oldiesbutgoodies.dto.request.UserDto;
+import com.hm.oldiesbutgoodies.dto.response.OtherUserDto;
+import com.hm.oldiesbutgoodies.dto.response.UserDto;
 import com.hm.oldiesbutgoodies.dto.request.UserInfoUpdateDto;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.domain.user.User;

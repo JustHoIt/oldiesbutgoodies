@@ -1,26 +1,28 @@
 package com.hm.oldiesbutgoodies.controller;
 
 import com.hm.oldiesbutgoodies.auth.JwtProvider;
-import com.hm.oldiesbutgoodies.dto.request.*;
-import com.hm.oldiesbutgoodies.dto.response.JwtResponse;
-import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.domain.user.User;
+import com.hm.oldiesbutgoodies.dto.request.LoginRequest;
+import com.hm.oldiesbutgoodies.dto.request.SignUpDto;
+import com.hm.oldiesbutgoodies.dto.request.UserInfoUpdateDto;
+import com.hm.oldiesbutgoodies.dto.response.JwtResponse;
+import com.hm.oldiesbutgoodies.dto.response.OtherUserDto;
+import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
+import com.hm.oldiesbutgoodies.dto.response.UserDto;
 import com.hm.oldiesbutgoodies.service.AuthService;
 import com.hm.oldiesbutgoodies.service.UserService;
-import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("/v1/users")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final AuthService authService;
     private final JwtProvider jwtProvider;
@@ -48,7 +50,7 @@ public class UserController {
 
     @PostMapping(value = "/users/mailAuth",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto> signupMailAuth(@RequestParam String email) throws MessagingException {
+    public ResponseEntity<ResponseDto> signupMailAuth(@RequestParam String email) {
         log.info("{} 인증 요청", email);
         return ResponseEntity.ok(authService.mailAuth(email));
     }
@@ -56,7 +58,7 @@ public class UserController {
     @GetMapping(value = "/getUser",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDto> getUser(@RequestHeader("Authorization") String token) {
-        String email = jwtProvider.getUsername(token);
+        String email = jwtProvider.getUserEmail(token);
         return ResponseEntity.ok(userService.getUserInfo(email));
     }
 
@@ -68,9 +70,9 @@ public class UserController {
 
     @PutMapping(value = "/infoUpdate",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto> userInfoUpdate(@RequestHeader("Authorization") String token,
+    public ResponseEntity<ResponseDto> userInfoUpdate(@RequestHeader("Authorization") String accessToken,
                                                       @RequestBody UserInfoUpdateDto dto) {
-        String tokenInfo = jwtProvider.getUsername(token);
+        String tokenInfo = jwtProvider.getUserEmail(accessToken);
         return ResponseEntity.ok(userService.userInfoUpdate(tokenInfo, dto));
     }
 
