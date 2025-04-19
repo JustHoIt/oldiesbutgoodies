@@ -1,6 +1,6 @@
 package com.hm.oldiesbutgoodies.domain.post;
 
-public enum PostType {
+public enum Category {
     FREE,
     QUESTION,
     TIP,

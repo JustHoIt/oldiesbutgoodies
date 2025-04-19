@@ -8,6 +8,8 @@ import com.hm.oldiesbutgoodies.dto.request.PostDto;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "posts")
 @Getter
@@ -28,14 +30,13 @@ public class Post extends BaseTimeEntity {
     @Column(name = "content", nullable = false)
     private String content;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
-
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ContentStatus postStatus;
 
-    @Column(name = "board_type", nullable = false)
-    private PostType boardType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false)
+    private Category category;
 
     @JoinColumn(name = "user_id", nullable = false)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,16 +52,29 @@ public class Post extends BaseTimeEntity {
     private int commentCount = 0;
 
     @Column(name = "is_pinned", nullable = false)
-    private boolean isPinned;
+    private boolean pinned;
+
+    @Column(name = "is_deleted", nullable = false)
+    private boolean deleted;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     public static Post from(PostDto dto) {
-        return com.hm.oldiesbutgoodies.domain.post.Post.builder()
+        return Post.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .postStatus(dto.getPostStatus())
-                .boardType(dto.getBoardType())
-                .isPinned(false)
+                .category(dto.getCategory())
+                .pinned(false)
                 .build();
+    }
+
+    public void update(PostDto dto) {
+        this.title = dto.getTitle();
+        this.content = dto.getContent();
+        this.postStatus = dto.getPostStatus();
+        this.category = dto.getCategory();
     }
 
 }

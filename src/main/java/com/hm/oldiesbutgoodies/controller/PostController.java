@@ -1,18 +1,18 @@
 package com.hm.oldiesbutgoodies.controller;
 
 import com.hm.oldiesbutgoodies.auth.JwtProvider;
+import com.hm.oldiesbutgoodies.dto.request.PostSummaryDto;
 import com.hm.oldiesbutgoodies.dto.request.PostDto;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.print.Pageable;
-
 @RestController("/v1/posts")
 @RequiredArgsConstructor
 @Slf4j
@@ -24,7 +24,7 @@ public class PostController {
     @PostMapping(value = "/",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> createPost(@RequestHeader("Authorization") String accessToken,
-                                                 @Valid @RequestBody PostDto dto) {
+                                                  @Valid @RequestBody PostDto dto) {
         String email = jwtProvider.getUserEmail(accessToken);
 
         return ResponseEntity.ok(postService.createPost(email, dto));
@@ -33,7 +33,7 @@ public class PostController {
     //수정
     @PutMapping(value = "/{postId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseDto> updatePost(@RequestHeader("Authorization") String accessToken,,
+    public ResponseEntity<ResponseDto> updatePost(@RequestHeader("Authorization") String accessToken,
                                                   @PathVariable Long postId,
                                                   @Valid @RequestBody PostDto dto) {
         String email = jwtProvider.getUserEmail(accessToken);
@@ -55,8 +55,8 @@ public class PostController {
     // 조회
     @GetMapping(value = "/{postId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getPostById(@RequestHeader("Authorization") String accessToken,
-                                      @PathVariable Long postId) {
+    public ResponseEntity<PostDto> getPostById(@RequestHeader("Authorization") String accessToken,
+                                               @PathVariable Long postId) {
         String email = jwtProvider.getUserEmail(accessToken);
 
         return ResponseEntity.ok(postService.getPostById(email, postId));
@@ -66,9 +66,14 @@ public class PostController {
     // 전체 조회
     @GetMapping(value = "",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Pageable<>> listPosts(@RequestParam String type) {
+    public ResponseEntity<Page<PostSummaryDto>> listPosts(@RequestParam(required = false) String category,
+                                                          @RequestParam(required = false) String keyword,
+                                                          Pageable pageable) {
 
-        return ResponseEntity.ok(postService.);
+
+        Page<PostSummaryDto> page = postService.listPosts(category, keyword, pageable);
+
+        return ResponseEntity.ok(page);
     }
 
 
