@@ -19,9 +19,8 @@ public enum ErrorCode {
     NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "", "중복된 닉네임이 존재합니다."),
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "", "비밀번호 형식이 올바르지 않습니다."),
     INVALID_VERIFICATION_CODE(HttpStatus.BAD_REQUEST, "", "잘못된 코드이거나, 유호기간이 만료되었습니다."),
-    POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "", "게시글이 존재하지 않거나, 잘못된 접근입니다.")
-    ;
-
+    POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "", "게시글이 존재하지 않거나, 잘못된 접근입니다."),
+    FILE_SAVE_FAILED_(HttpStatus.BAD_REQUEST, "", "파일 저장에 실패했습니다.");
 
 
     private final HttpStatus status;

@@ -1,6 +1,8 @@
 package com.hm.oldiesbutgoodies.service;
 
+import com.hm.oldiesbutgoodies.domain.ContentImage;
 import com.hm.oldiesbutgoodies.domain.ContentStatus;
+import com.hm.oldiesbutgoodies.domain.ContentType;
 import com.hm.oldiesbutgoodies.domain.post.Category;
 import com.hm.oldiesbutgoodies.domain.post.Post;
 import com.hm.oldiesbutgoodies.domain.user.User;
@@ -9,6 +11,7 @@ import com.hm.oldiesbutgoodies.dto.request.PostSummaryDto;
 import com.hm.oldiesbutgoodies.dto.response.ResponseDto;
 import com.hm.oldiesbutgoodies.exception.CustomException;
 import com.hm.oldiesbutgoodies.exception.ErrorCode;
+import com.hm.oldiesbutgoodies.repository.ContentImageRepository;
 import com.hm.oldiesbutgoodies.repository.PostRepository;
 import com.hm.oldiesbutgoodies.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +20,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -28,16 +34,21 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final ContentImageRepository contentImageRepository;
+    private final FileStorageService storage;
 
 
     //글 작성
     @Transactional
-    public ResponseDto createPost(String email, PostDto dto) {
+    public ResponseDto createPost(String email, PostDto dto, List<MultipartFile> files) {
         User user = findUserByEmail(email);
         Post post = Post.from(dto);
         post.setUser(user);
 
         postRepository.save(post);
+
+        attachImages(post.getId(), files);
+
 
         log.info("{} 님이 postId : {}, {} 라는 제목으로 글을 작성했습니다.", user.getName(), post.getId(), dto.getTitle());
 
@@ -46,7 +57,7 @@ public class PostService {
 
     //글 수정
     @Transactional
-    public ResponseDto updatePost(String email, Long postId, PostDto dto) {
+    public ResponseDto updatePost(String email, Long postId, PostDto dto, List<MultipartFile> files) {
         User user = findUserByEmail(email);
 
         Post post = loadExistingPost(postId);
@@ -84,6 +95,12 @@ public class PostService {
 
         Post post = loadExistingPost(postId);
 
+        List<String> urls = contentImageRepository.findAllByContentTypeAndOwnerIdOrderByPositionAsc(
+                        ContentType.POST, postId)
+                .stream()
+                .map(ContentImage::getUrl)
+                .toList();
+
         checkVisibility(user, post);
 
         return PostDto.from(post);
@@ -94,7 +111,7 @@ public class PostService {
                                           String keyword,
                                           Pageable pageable) {
         Category cg = Category.valueOf(category);
-        if(!isBlank(category) && isBlank(keyword)) {
+        if (!isBlank(category) && isBlank(keyword)) {
             return postRepository
                     .findAllByCategoryAndDeletedFalse(cg, pageable)
                     .map(PostSummaryDto::from);
@@ -159,6 +176,21 @@ public class PostService {
             }
 
             default -> throw new CustomException(ErrorCode.USER_NOT_AUTHOR);
+        }
+    }
+
+    private void attachImages(Long ownerId, List<MultipartFile> images) throws IOException {
+        if (images == null || images.isEmpty()) return;
+        int pos = 0;
+        for (MultipartFile file : images) {
+            String url = storage.store(file, ContentType.valueOf(ContentType.POST.name()));
+
+            contentImageRepository.save(ContentImage.builder()
+                    .contentType(ContentType.POST)
+                    .ownerId(ownerId)
+                    .url(url)
+                    .position(pos++)
+                    .build());
         }
     }
 }

@@ -1,11 +1,14 @@
 package com.hm.oldiesbutgoodies.dto.request;
 
+import com.hm.oldiesbutgoodies.domain.ContentImage;
 import com.hm.oldiesbutgoodies.domain.ContentStatus;
 import com.hm.oldiesbutgoodies.domain.post.Post;
 import com.hm.oldiesbutgoodies.domain.post.Category;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Setter
 @Getter
@@ -16,6 +19,7 @@ public class PostDto {
     private String content;
     private ContentStatus postStatus;
     private Category category;
+    private List<String> imageUrls;
 
 
     public static PostDto from(Post post) {
@@ -23,6 +27,10 @@ public class PostDto {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .category(post.getCategory())
+                .imageUrls(post.getImages()
+                        .stream()
+                        .map(ContentImage::getUrl)
+                        .toList())
                 .build();
     }
 

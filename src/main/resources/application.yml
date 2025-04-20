@@ -78,3 +78,7 @@ spring:
 jwt:
   secret: ${jwt_secret}
   expiration: 3600000
+
+app:
+  upload:
+    dir: ./uploads

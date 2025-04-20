@@ -13,6 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
 @RestController("/v1/posts")
 @RequiredArgsConstructor
 @Slf4j
@@ -24,10 +28,11 @@ public class PostController {
     @PostMapping(value = "/",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> createPost(@RequestHeader("Authorization") String accessToken,
-                                                  @Valid @RequestBody PostDto dto) {
+                                                  @RequestPart("post") @Valid PostDto dto,
+                                                  @RequestPart(value = "images", required = false)List<MultipartFile> images) {
         String email = jwtProvider.getUserEmail(accessToken);
 
-        return ResponseEntity.ok(postService.createPost(email, dto));
+        return ResponseEntity.ok(postService.createPost(email, dto, images));
     }
 
     //수정
@@ -35,10 +40,11 @@ public class PostController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> updatePost(@RequestHeader("Authorization") String accessToken,
                                                   @PathVariable Long postId,
-                                                  @Valid @RequestBody PostDto dto) {
+                                                  @RequestPart("post") @Valid PostDto dto,
+                                                  @RequestPart(value = "images", required = false)List<MultipartFile> images) {
         String email = jwtProvider.getUserEmail(accessToken);
 
-        return ResponseEntity.ok(postService.updatePost(email, postId, dto));
+        return ResponseEntity.ok(postService.updatePost(email, postId, dto, images));
     }
 
 

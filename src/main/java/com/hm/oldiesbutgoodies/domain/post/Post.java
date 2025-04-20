@@ -2,13 +2,20 @@ package com.hm.oldiesbutgoodies.domain.post;
 
 
 import com.hm.oldiesbutgoodies.domain.BaseTimeEntity;
+import com.hm.oldiesbutgoodies.domain.ContentImage;
 import com.hm.oldiesbutgoodies.domain.ContentStatus;
 import com.hm.oldiesbutgoodies.domain.user.User;
 import com.hm.oldiesbutgoodies.dto.request.PostDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -59,6 +66,20 @@ public class Post extends BaseTimeEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumnsOrFormulas({
+            @JoinColumnOrFormula(column =
+            @JoinColumn(name = "owner_id", referencedColumnName = "id",
+                    insertable = false, updatable = false)
+            ),
+            @JoinColumnOrFormula(formula =
+            @JoinFormula(value = "'POST'", referencedColumnName = "owner_type")
+            )
+    })
+    @OrderBy("position ASC")
+    private List<ContentImage> images = new ArrayList<>();
 
     public static Post from(PostDto dto) {
         return Post.builder()
