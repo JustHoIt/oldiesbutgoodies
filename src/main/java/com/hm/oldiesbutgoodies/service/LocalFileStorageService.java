@@ -1,8 +1,6 @@
 package com.hm.oldiesbutgoodies.service;
 
-import com.hm.oldiesbutgoodies.domain.ContentType;
-import com.hm.oldiesbutgoodies.exception.CustomException;
-import com.hm.oldiesbutgoodies.exception.ErrorCode;
+import com.hm.oldiesbutgoodies.domain.OwnerType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,27 +17,36 @@ import java.util.UUID;
 public class LocalFileStorageService implements FileStorageService {
 
     @Value("${app.upload.dir}")
-    private String uploadDir;
+    private String baseDir;
 
     @Override
-    public String store(MultipartFile file) throws IOException {
-        return store(file, ContentType.valueOf(""));
+    public String store(MultipartFile file) {
+        return store(file, null);
     }
 
     @Override
-    public String store(MultipartFile file, ContentType contentType) throws IOException {
-        String filename = UUID.randomUUID() + "-" + file.getOriginalFilename();
-        String ownerType = contentType.toString();
+    public String store(MultipartFile file, OwnerType ownerType) {
+        Path dir = (ownerType == null)
+                ? Paths.get(baseDir)
+                : Paths.get(baseDir, ownerType.name().toLowerCase());
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException e) {
+            throw new RuntimeException("디렉토리 생성 실패", e);
+        }
 
-        Path dir = ownerType.isBlank()
-                ? Paths.get(uploadDir)
-                : Paths.get(uploadDir, ownerType.toLowerCase());
-        Files.createDirectories(dir);
+        String filename = UUID.randomUUID() + "-" + file.getOriginalFilename();
         Path target = dir.resolve(filename);
+
         try (InputStream in = file.getInputStream()) {
             Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("파일 저장 실패", e);
         }
-        return "/uploads/" + (ownerType.isBlank() ? "" : ownerType.toLowerCase() + "/") + filename;
+
+        String prefix = (ownerType == null) ? "" : ownerType.name().toLowerCase() + "/";
+        return "/uploads/" + prefix + filename;
     }
+
 
 }

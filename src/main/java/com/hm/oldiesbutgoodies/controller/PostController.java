@@ -17,7 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@RestController("/v1/posts")
+@RestController
+@RequestMapping("/v1/posts")
 @RequiredArgsConstructor
 @Slf4j
 public class PostController {
@@ -26,10 +27,10 @@ public class PostController {
     private final JwtProvider jwtProvider;
 
     @PostMapping(value = "/",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto> createPost(@RequestHeader("Authorization") String accessToken,
                                                   @RequestPart("post") @Valid PostDto dto,
-                                                  @RequestPart(value = "images", required = false)List<MultipartFile> images) {
+                                                  @RequestParam(value = "images", required = false)List<MultipartFile> images) {
         String email = jwtProvider.getUserEmail(accessToken);
 
         return ResponseEntity.ok(postService.createPost(email, dto, images));
@@ -37,11 +38,11 @@ public class PostController {
 
     //수정
     @PutMapping(value = "/{postId}",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseDto> updatePost(@RequestHeader("Authorization") String accessToken,
                                                   @PathVariable Long postId,
                                                   @RequestPart("post") @Valid PostDto dto,
-                                                  @RequestPart(value = "images", required = false)List<MultipartFile> images) {
+                                                  @RequestParam(value = "images", required = false)List<MultipartFile> images) {
         String email = jwtProvider.getUserEmail(accessToken);
 
         return ResponseEntity.ok(postService.updatePost(email, postId, dto, images));

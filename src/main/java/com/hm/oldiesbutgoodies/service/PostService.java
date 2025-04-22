@@ -2,7 +2,7 @@ package com.hm.oldiesbutgoodies.service;
 
 import com.hm.oldiesbutgoodies.domain.ContentImage;
 import com.hm.oldiesbutgoodies.domain.ContentStatus;
-import com.hm.oldiesbutgoodies.domain.ContentType;
+import com.hm.oldiesbutgoodies.domain.OwnerType;
 import com.hm.oldiesbutgoodies.domain.post.Category;
 import com.hm.oldiesbutgoodies.domain.post.Post;
 import com.hm.oldiesbutgoodies.domain.user.User;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,7 +48,12 @@ public class PostService {
 
         attachImages(post.getId(), files);
 
+        //임시
+        List<String> urls = contentImageRepository
+                .findAllByOwnerTypeAndOwnerIdOrderByPositionAsc(OwnerType.POST, post.getId())
+                .stream().map(ContentImage::getUrl).toList();
 
+        log.info("{}", urls);
         log.info("{} 님이 postId : {}, {} 라는 제목으로 글을 작성했습니다.", user.getName(), post.getId(), dto.getTitle());
 
         return ResponseDto.setMessage("글이 성공적으로 작성됐습니다.");
@@ -65,6 +69,14 @@ public class PostService {
         validateOwner(post, user);
 
         post.update(dto);
+
+        attachImages(postId, files);
+        //임시
+        List<String> urls = contentImageRepository
+                .findAllByOwnerTypeAndOwnerIdOrderByPositionAsc(OwnerType.POST, post.getId())
+                .stream().map(ContentImage::getUrl).toList();
+
+        log.info("{}", urls);
 
         log.info("{} 님이 postId : {}의 게시글을 수정했습니다.", user.getName(), post.getId());
 
@@ -94,31 +106,43 @@ public class PostService {
                 : null;
 
         Post post = loadExistingPost(postId);
+        checkVisibility(user, post);
 
-        List<String> urls = contentImageRepository.findAllByContentTypeAndOwnerIdOrderByPositionAsc(
-                        ContentType.POST, postId)
+        List<String> urls = contentImageRepository.findAllByOwnerTypeAndOwnerIdOrderByPositionAsc(
+                        OwnerType.POST, postId)
                 .stream()
                 .map(ContentImage::getUrl)
                 .toList();
 
-        checkVisibility(user, post);
-
-        return PostDto.from(post);
+        return PostDto.from(post, urls);
     }
 
     //글 조회(리스트)
     public Page<PostSummaryDto> listPosts(String category,
                                           String keyword,
                                           Pageable pageable) {
-        Category cg = Category.valueOf(category);
-        if (!isBlank(category) && isBlank(keyword)) {
-            return postRepository
-                    .findAllByCategoryAndDeletedFalse(cg, pageable)
-                    .map(PostSummaryDto::from);
+        Category cg = null;
+        if (!isBlank(category)) {
+            cg = Category.valueOf(category.toUpperCase());
         }
 
-        return postRepository.findAllByDeletedFalse(pageable)
-                .map(PostSummaryDto::from);
+        Page<Post> postPage;
+        if (cg != null && isBlank(keyword)) {
+            postPage = postRepository.findAllByCategoryAndDeletedFalse(cg, pageable);
+        } else {
+            postPage = postRepository.findAllByDeletedFalse(pageable);
+        }
+
+        return postPage.map(post -> {
+            String thumb = contentImageRepository
+                    .findAllByOwnerTypeAndOwnerIdOrderByPositionAsc(OwnerType.POST, post.getId())
+                    .stream()
+                    .findFirst()
+                    .map(ContentImage::getUrl)
+                    .orElse(null);
+
+            return PostSummaryDto.from(post, thumb);
+        });
     }
 
     private boolean isBlank(String s) {
@@ -139,6 +163,27 @@ public class PostService {
     private Post loadExistingPost(Long postId) {
         return postRepository.findByIdAndDeletedFalse(postId)
                 .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    }
+
+    /* 이미지 업로드 공통 로직 */
+    private void attachImages(Long postId, List<MultipartFile> images) {
+        if (images == null || images.isEmpty()) return;
+
+        // 1) 기존 이미지 모두 삭제 (수정 시)
+        contentImageRepository.deleteAllByOwnerTypeAndOwnerId(OwnerType.POST, postId);
+
+        // 2) 새 이미지 저장
+        int pos = 0;
+        for (MultipartFile file : images) {
+            String url = storage.store(file, OwnerType.valueOf(OwnerType.POST.name()));
+            ContentImage ci = ContentImage.builder()
+                    .ownerType(OwnerType.POST)
+                    .ownerId(postId)
+                    .url(url)
+                    .position(pos++)
+                    .build();
+            contentImageRepository.save(ci);
+        }
     }
 
     private void checkVisibility(User user, Post post) {
@@ -176,21 +221,6 @@ public class PostService {
             }
 
             default -> throw new CustomException(ErrorCode.USER_NOT_AUTHOR);
-        }
-    }
-
-    private void attachImages(Long ownerId, List<MultipartFile> images) throws IOException {
-        if (images == null || images.isEmpty()) return;
-        int pos = 0;
-        for (MultipartFile file : images) {
-            String url = storage.store(file, ContentType.valueOf(ContentType.POST.name()));
-
-            contentImageRepository.save(ContentImage.builder()
-                    .contentType(ContentType.POST)
-                    .ownerId(ownerId)
-                    .url(url)
-                    .position(pos++)
-                    .build());
         }
     }
 }

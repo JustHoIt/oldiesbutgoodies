@@ -18,12 +18,7 @@ public class PostSummaryDto {
     private LocalDateTime createAt;
     private String thumbnailUrl;
 
-    public static PostSummaryDto from(Post post) {
-        String thumb = post.getImages().stream()
-                .findFirst()
-                .map(ContentImage::getUrl)
-                .orElse(null);
-
+    public static PostSummaryDto from(Post post, String thumbnailUrl) {
         return PostSummaryDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
@@ -31,7 +26,7 @@ public class PostSummaryDto {
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .createAt(post.getCreatedAt())
-                .thumbnailUrl(thumb)
+                .thumbnailUrl(thumbnailUrl)
                 .build();
     }
 

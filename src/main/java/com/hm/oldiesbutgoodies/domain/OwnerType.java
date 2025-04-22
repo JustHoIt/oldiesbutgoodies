@@ -1,6 +1,6 @@
 package com.hm.oldiesbutgoodies.domain;
 
-public enum ContentType {
+public enum OwnerType {
     POST,
     SHOP
 }

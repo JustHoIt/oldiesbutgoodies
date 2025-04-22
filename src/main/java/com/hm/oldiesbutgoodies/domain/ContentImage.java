@@ -1,8 +1,9 @@
 package com.hm.oldiesbutgoodies.domain;
 
-import com.hm.oldiesbutgoodies.domain.post.Post;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "content_images")
@@ -11,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ContentImage extends BaseTimeEntity {
+public class ContentImage{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,13 +22,12 @@ public class ContentImage extends BaseTimeEntity {
     private Long ownerId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "content_type", nullable = false)
-    private ContentType contentType;
+    @Column(name = "owner_type", nullable = false)
+    private OwnerType ownerType;
 
-    @Column(name = "url", nullable = false)
+    @Column(nullable = false)
     private String url;
 
     private int position;
-
 
 }

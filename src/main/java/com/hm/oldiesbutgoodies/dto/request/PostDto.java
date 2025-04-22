@@ -22,17 +22,12 @@ public class PostDto {
     private List<String> imageUrls;
 
 
-    public static PostDto from(Post post) {
+    public static PostDto from(Post post, List<String> imageUrls) {
         return PostDto.builder()
                 .title(post.getTitle())
                 .content(post.getContent())
                 .category(post.getCategory())
-                .imageUrls(post.getImages()
-                        .stream()
-                        .map(ContentImage::getUrl)
-                        .toList())
+                .imageUrls(imageUrls)
                 .build();
     }
-
-
 }
