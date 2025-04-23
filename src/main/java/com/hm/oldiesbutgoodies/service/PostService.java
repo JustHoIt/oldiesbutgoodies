@@ -96,7 +96,7 @@ public class PostService {
         post.setDeleted(true);
         post.setDeletedAt(LocalDateTime.now());
 
-        return ResponseDto.setMessage("Post ID : " + post.getId() + "글이 isDeleted= true 로 변경됐습니다. ");
+        return ResponseDto.setMessage("Post ID : " + post.getId() + "글이 삭제 처리 됐습니다. ");
     }
 
     //글 조회(단건 상세)
