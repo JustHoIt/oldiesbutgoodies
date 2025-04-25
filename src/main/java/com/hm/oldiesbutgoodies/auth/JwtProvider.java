@@ -1,6 +1,6 @@
 package com.hm.oldiesbutgoodies.auth;
 
-import com.hm.oldiesbutgoodies.dto.response.JwtResponse;
+import com.hm.oldiesbutgoodies.user.dto.response.JwtResponse;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
