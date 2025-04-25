@@ -6,6 +6,10 @@ import com.hm.oldiesbutgoodies.content.domain.OwnerType;
 import com.hm.oldiesbutgoodies.content.domain.Category;
 import com.hm.oldiesbutgoodies.content.domain.Post;
 import com.hm.oldiesbutgoodies.common.service.FileStorageService;
+import com.hm.oldiesbutgoodies.content.dto.request.CommentDto;
+import com.hm.oldiesbutgoodies.content.dto.response.CommentResponseDto;
+import com.hm.oldiesbutgoodies.content.dto.response.PostDetailDto;
+import com.hm.oldiesbutgoodies.content.repository.CommentRepository;
 import com.hm.oldiesbutgoodies.user.domain.User;
 import com.hm.oldiesbutgoodies.content.dto.request.PostDto;
 import com.hm.oldiesbutgoodies.content.dto.request.PostSummaryDto;
@@ -14,6 +18,8 @@ import com.hm.oldiesbutgoodies.common.exception.CustomException;
 import com.hm.oldiesbutgoodies.common.exception.ErrorCode;
 import com.hm.oldiesbutgoodies.content.repository.ContentImageRepository;
 import com.hm.oldiesbutgoodies.content.repository.PostRepository;
+import com.hm.oldiesbutgoodies.user.domain.UserProfile;
+import com.hm.oldiesbutgoodies.user.repository.UserProfileRepository;
 import com.hm.oldiesbutgoodies.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +40,8 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final CommentRepository commentRepository;
     private final ContentImageRepository contentImageRepository;
     private final FileStorageService storage;
 
@@ -97,11 +105,13 @@ public class PostService {
         post.setDeleted(true);
         post.setDeletedAt(LocalDateTime.now());
 
+        commentRepository.softDeleteByOwner(OwnerType.POST, postId);
+
         return ResponseDto.setMessage("Post ID : " + post.getId() + "글이 삭제 처리 됐습니다. ");
     }
 
     //글 조회(단건 상세)
-    public PostDto getPostById(String email, Long postId) {
+    public PostDetailDto getPostById(String email, Long postId) {
         User user = (email != null && !email.isBlank())
                 ? findUserByEmail(email)
                 : null;
@@ -115,7 +125,24 @@ public class PostService {
                 .map(ContentImage::getUrl)
                 .toList();
 
-        return PostDto.from(post, urls);
+        List<CommentResponseDto> comments = commentRepository.findAllByOwnerTypeAndOwnerIdAndDeletedFalse(OwnerType.POST, postId)
+                .stream()
+                .map(comment -> {
+                    UserProfile profile = user.getUserProfile();
+
+                    return CommentResponseDto.builder()
+                            .id(comment.getId())
+                            .content(comment.getContent())
+                            .userId(user.getId())
+                            .userNickname(profile.getNickname())
+                            .userProfileImg(profile.getProfileImg())
+                            .createdAt(comment.getCreatedAt())
+                            .updatedAt(comment.getUpdatedAt())
+                            .build();
+                })
+                .toList();
+
+        return PostDetailDto.from(post, urls, comments);
     }
 
     //글 조회(리스트)

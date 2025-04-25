@@ -48,6 +48,7 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+
     public static Comment from(CommentDto dto, OwnerType ownerType, Long ownerId) {
         return Comment.builder()
                 .content(dto.getContent())

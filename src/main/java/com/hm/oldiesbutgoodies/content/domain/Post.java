@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -58,20 +60,6 @@ public class Post extends BaseTimeEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
-
-
-//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-//    @JoinColumnsOrFormulas({
-//            @JoinColumnOrFormula(column =
-//            @JoinColumn(name = "owner_id", referencedColumnName = "id",
-//                    insertable = false, updatable = false)
-//            ),
-//            @JoinColumnOrFormula(formula =
-//            @JoinFormula(value = "'POST'", referencedColumnName = "owner_type")
-//            )
-//    })
-//    @OrderBy("position ASC")
-//    private List<ContentImage> images = new ArrayList<>();
 
     public static Post from(PostDto dto) {
         return Post.builder()

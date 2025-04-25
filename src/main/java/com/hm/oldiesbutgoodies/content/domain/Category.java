@@ -4,5 +4,6 @@ public enum Category {
     FREE,
     QUESTION,
     TIP,
-    REVIEW
+    REVIEW,
+    OOTD
 }
