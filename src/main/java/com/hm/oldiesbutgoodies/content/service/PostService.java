@@ -6,6 +6,7 @@ import com.hm.oldiesbutgoodies.content.domain.OwnerType;
 import com.hm.oldiesbutgoodies.content.domain.Category;
 import com.hm.oldiesbutgoodies.content.domain.Post;
 import com.hm.oldiesbutgoodies.common.service.FileStorageService;
+import com.hm.oldiesbutgoodies.content.repository.CommentRepository;
 import com.hm.oldiesbutgoodies.user.domain.User;
 import com.hm.oldiesbutgoodies.content.dto.request.PostDto;
 import com.hm.oldiesbutgoodies.content.dto.request.PostSummaryDto;
@@ -34,6 +35,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
     private final ContentImageRepository contentImageRepository;
     private final FileStorageService storage;
 
@@ -96,6 +98,8 @@ public class PostService {
 
         post.setDeleted(true);
         post.setDeletedAt(LocalDateTime.now());
+
+        commentRepository.softDeleteByOwner(OwnerType.POST, postId);
 
         return ResponseDto.setMessage("Post ID : " + post.getId() + "글이 삭제 처리 됐습니다. ");
     }
