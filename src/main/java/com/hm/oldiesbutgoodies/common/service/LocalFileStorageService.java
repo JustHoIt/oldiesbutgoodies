@@ -1,6 +1,6 @@
 package com.hm.oldiesbutgoodies.common.service;
 
-import com.hm.oldiesbutgoodies.content.domain.OwnerType;
+import com.hm.oldiesbutgoodies.common.domain.OwnerType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

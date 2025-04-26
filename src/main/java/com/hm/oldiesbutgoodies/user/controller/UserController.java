@@ -1,6 +1,6 @@
 package com.hm.oldiesbutgoodies.user.controller;
 
-import com.hm.oldiesbutgoodies.auth.JwtProvider;
+import com.hm.oldiesbutgoodies.security.JwtProvider;
 import com.hm.oldiesbutgoodies.user.domain.User;
 import com.hm.oldiesbutgoodies.user.dto.request.LoginRequest;
 import com.hm.oldiesbutgoodies.user.dto.request.SignUpDto;

@@ -1,8 +1,8 @@
 package com.hm.oldiesbutgoodies.common.config;
 
-import com.hm.oldiesbutgoodies.auth.JwtAuthenticationFilter;
-import com.hm.oldiesbutgoodies.auth.JwtProvider;
-import com.hm.oldiesbutgoodies.auth.OAuth2AuthenticationSuccessHandler;
+import com.hm.oldiesbutgoodies.security.JwtAuthenticationFilter;
+import com.hm.oldiesbutgoodies.security.JwtProvider;
+import com.hm.oldiesbutgoodies.security.OAuth2AuthenticationSuccessHandler;
 import com.hm.oldiesbutgoodies.user.service.CustomOAuth2UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

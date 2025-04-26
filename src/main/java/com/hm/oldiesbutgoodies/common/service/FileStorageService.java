@@ -1,6 +1,6 @@
 package com.hm.oldiesbutgoodies.common.service;
 
-import com.hm.oldiesbutgoodies.content.domain.OwnerType;
+import com.hm.oldiesbutgoodies.common.domain.OwnerType;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileStorageService {
