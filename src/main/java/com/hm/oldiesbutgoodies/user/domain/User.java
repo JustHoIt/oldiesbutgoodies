@@ -39,6 +39,9 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
+    @Column(name = "is_seller", nullable = false)
+    private Boolean isSeller;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private UserProfile userProfile;
 
@@ -56,6 +59,7 @@ public class User extends BaseTimeEntity {
                 .role("ROLE_USER")
                 .oauth2ServiceName(Oauth2ServiceName.NONE)
                 .status(UserStatus.ACTIVE)
+                .isSeller(false)
                 .build();
     }
 
@@ -67,6 +71,7 @@ public class User extends BaseTimeEntity {
                 .oauth2ServiceName(Oauth2ServiceName.KAKAO)
                 .role("ROLE_USER")
                 .status(UserStatus.ACTIVE)
+                .isSeller(false)
                 .build();
     }
 
@@ -79,6 +84,7 @@ public class User extends BaseTimeEntity {
                 .role("ROLE_USER")
                 .oauth2ServiceName(Oauth2ServiceName.NAVER)
                 .status(UserStatus.ACTIVE)
+                .isSeller(false)
                 .build();
     }
 }

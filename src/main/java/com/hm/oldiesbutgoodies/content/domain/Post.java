@@ -2,14 +2,12 @@ package com.hm.oldiesbutgoodies.content.domain;
 
 
 import com.hm.oldiesbutgoodies.common.domain.BaseTimeEntity;
-import com.hm.oldiesbutgoodies.user.domain.User;
 import com.hm.oldiesbutgoodies.content.dto.request.PostDto;
+import com.hm.oldiesbutgoodies.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "posts")

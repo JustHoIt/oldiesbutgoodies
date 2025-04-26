@@ -31,6 +31,7 @@ import java.util.Optional;
 public class AuthService {
 
     private static final Duration MAIL_AUTH_EXPIRATION = Duration.ofMinutes(3);
+    private static final String DEFAULT_PROFILE_URL = "/images/default-profile.png";
 
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
@@ -47,6 +48,7 @@ public class AuthService {
         User user = User.from(dto);
         user.setPassword(PasswordUtil.hashPassword(dto.getPassword()));
         UserProfile userProfile = UserProfile.from(dto);
+        userProfile.setProfileImg(DEFAULT_PROFILE_URL);
         user.setUserProfile(userProfile);
 
         userRepository.save(user);
