@@ -41,21 +41,11 @@ public class CommentService {
 
         String ownerT = ownerType.toString();
         log.info(ownerT);
-        incrementCount(ownerT, resourceId);
+
+        commentCount(ownerT, resourceId, +1);
 
         return ResponseDto.setMessage(user.getName() + "님이 댓글을 작성했습니다.");
     }
-
-    public void incrementCount(String s, long resourceId) {
-        if(s.equals("POST")){
-            Post post = findPost(resourceId);
-            post.incrementComments();
-        }else {
-            Product product = findProduct(resourceId);
-            product.incrementComments();
-        }
-    }
-
 
     @Transactional
     public ResponseDto updateComment(String email, OwnerType ownerType, Long resourceId, Long commentId, CommentDto commentDto) {
@@ -88,18 +78,17 @@ public class CommentService {
 
         String ownerT = ownerType.toString();
         log.info(ownerT);
-        decrementCount(ownerT, resourceId);
+
+        commentCount(ownerT, resourceId, -1);
 
         return ResponseDto.setMessage("Comment ID : " + commentId + "댓글이 삭제 처리 됐습니다. ");
     }
 
-    public void decrementCount(String s, long resourceId) {
+    public void commentCount(String s, long resourceId, int n) {
         if(s.equals("POST")){
-            Post post = findPost(resourceId);
-            post.decrementComments();
+            postRepository.updateCommentCount(resourceId, n);
         }else {
-            Product product = findProduct(resourceId);
-            product.decrementComments();
+            productRepository.updateCommentCount(resourceId, n);
         }
     }
 

@@ -33,14 +33,14 @@ public class PostInteractionService {
 
         if (postLikeRepository.existsByPostIdAndUserId(postId, user.getId())) {
             postLikeRepository.deleteByPostIdAndUserId(postId, user.getId());
-            post.decrementLikes();
+            postRepository.updateLikeCount(postId, -1);
             return ResponseDto.setMessage("좋아요를 취소 했습니다.");
         } else {
             postLikeRepository.save(PostLike.builder()
                     .user(user)
                     .post(post)
                     .build());
-            post.incrementLikes();
+            postRepository.updateLikeCount(postId, +1);
             return ResponseDto.setMessage("좋아요를 눌렀습니다.");
         }
     }
@@ -51,14 +51,14 @@ public class PostInteractionService {
 
         if (postBookmarkRepository.existsByPostIdAndUserId(postId, user.getId())) {
             postBookmarkRepository.deleteByPostIdAndUserId(postId, user.getId());
-            post.decrementBookmarks();
+            postRepository.updateBookmarkCount(postId, -1);
             return ResponseDto.setMessage("북마크를 취소 했습니다.");
         } else {
             postBookmarkRepository.save(PostBookmark.builder()
                     .user(user)
                     .post(post)
                     .build());
-            post.incrementBookmarks();
+            postRepository.updateBookmarkCount(postId, +1);
             return ResponseDto.setMessage("게시글을 북마크를 했습니다.");
         }
     }

@@ -141,6 +141,8 @@ public class PostService {
                 })
                 .toList();
 
+        postRepository.updateViewCount(postId);
+
         return PostDetailDto.from(post, urls, comments);
     }
 

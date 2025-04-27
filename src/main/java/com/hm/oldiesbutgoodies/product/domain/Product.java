@@ -86,30 +86,4 @@ public class Product extends BaseTimeEntity {
                 .status(dto.getStatus())
                 .build();
     }
-
-
-    public void incrementLikes() {
-        this.likeCount++;
-    }
-
-    public void decrementLikes() {
-        this.likeCount--;
-    }
-
-    public void incrementBookmarks() {
-        this.bookmarkCount++;
-    }
-
-    public void decrementBookmarks() {
-        this.bookmarkCount--;
-    }
-
-    public void incrementComments() {
-        this.commentCount++;
-    }
-
-    public void decrementComments() {
-        this.commentCount--;
-    }
-
 }
