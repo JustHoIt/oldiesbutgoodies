@@ -47,6 +47,9 @@ public class Post extends BaseTimeEntity {
     @Column(name = "like_count", nullable = false)
     private int likeCount = 0;
 
+    @Column(name = "bookmark_count", nullable = false)
+    private int bookmarkCount = 0;
+
     @Column(name = "comment_count", nullable = false)
     private int commentCount = 0;
 
@@ -75,5 +78,30 @@ public class Post extends BaseTimeEntity {
         this.postStatus = dto.getPostStatus();
         this.category = dto.getCategory();
     }
+
+    public void incrementLikes() {
+        this.likeCount++;
+    }
+
+    public void decrementLikes() {
+        this.likeCount--;
+    }
+
+    public void incrementBookmarks() {
+        this.bookmarkCount++;
+    }
+
+    public void decrementBookmarks() {
+        this.bookmarkCount--;
+    }
+
+    public void incrementComments() {
+        this.commentCount++;
+    }
+
+    public void decrementComments() {
+        this.commentCount--;
+    }
+
 
 }

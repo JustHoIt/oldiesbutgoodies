@@ -2,6 +2,9 @@ package com.hm.oldiesbutgoodies.comment.service;
 
 import com.hm.oldiesbutgoodies.comment.domain.Comment;
 import com.hm.oldiesbutgoodies.common.domain.OwnerType;
+import com.hm.oldiesbutgoodies.post.domain.Post;
+import com.hm.oldiesbutgoodies.product.domain.Product;
+import com.hm.oldiesbutgoodies.product.repository.ProductRepository;
 import com.hm.oldiesbutgoodies.user.domain.User;
 import com.hm.oldiesbutgoodies.comment.dto.request.CommentDto;
 import com.hm.oldiesbutgoodies.common.dto.ResponseDto;
@@ -24,6 +27,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
     public ResponseDto createComment(String email, OwnerType ownerType, Long resourceId, CommentDto commentDto) {
@@ -35,12 +39,26 @@ public class CommentService {
         comment.setUser(user);
         commentRepository.save(comment);
 
+        String ownerT = ownerType.toString();
+        log.info(ownerT);
+        incrementCount(ownerT, resourceId);
+
         return ResponseDto.setMessage(user.getName() + "님이 댓글을 작성했습니다.");
+    }
+
+    public void incrementCount(String s, long resourceId) {
+        if(s.equals("POST")){
+            Post post = findPost(resourceId);
+            post.incrementComments();
+        }else {
+            Product product = findProduct(resourceId);
+            product.incrementComments();
+        }
     }
 
 
     @Transactional
-    public ResponseDto updateComment(String email, OwnerType ownerType, Long resourceId , Long commentId, CommentDto commentDto) {
+    public ResponseDto updateComment(String email, OwnerType ownerType, Long resourceId, Long commentId, CommentDto commentDto) {
         findOwnerType(ownerType, resourceId);
 
         User user = findUserByEmail(email);
@@ -54,9 +72,9 @@ public class CommentService {
     }
 
 
-    /* 글 삭제(Soft-Delete) */
+    /* 댓글 삭제(Soft-Delete) */
     @Transactional
-    public ResponseDto deleteComment(String email, OwnerType ownerType, Long resourceId , Long commentId) {
+    public ResponseDto deleteComment(String email, OwnerType ownerType, Long resourceId, Long commentId) {
         findOwnerType(ownerType, resourceId);
 
         User user = findUserByEmail(email);
@@ -68,9 +86,23 @@ public class CommentService {
         comment.setDeleted(true);
         comment.setDeletedAt(LocalDateTime.now());
 
+        String ownerT = ownerType.toString();
+        log.info(ownerT);
+        decrementCount(ownerT, resourceId);
 
         return ResponseDto.setMessage("Comment ID : " + commentId + "댓글이 삭제 처리 됐습니다. ");
     }
+
+    public void decrementCount(String s, long resourceId) {
+        if(s.equals("POST")){
+            Post post = findPost(resourceId);
+            post.decrementComments();
+        }else {
+            Product product = findProduct(resourceId);
+            product.decrementComments();
+        }
+    }
+
 
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(email)
@@ -81,8 +113,7 @@ public class CommentService {
         switch (ownerType) {
             case POST -> postRepository.findByIdAndDeletedFalse(resourceId)
                     .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
-            //🚨FIXME: SHOP 생기면 수정
-            case SHOP -> postRepository.findByIdAndDeletedFalse(resourceId)
+            case PRODUCT -> postRepository.findByIdAndDeletedFalse(resourceId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         }
     }
@@ -98,8 +129,13 @@ public class CommentService {
         }
     }
 
+    private Post findPost(long postId) {
+        return postRepository.findByIdAndDeletedFalse(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    }
 
-
-
-
+    private Product findProduct(long productId) {
+        return productRepository.findByIdAndDeletedFalse(productId)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
 }

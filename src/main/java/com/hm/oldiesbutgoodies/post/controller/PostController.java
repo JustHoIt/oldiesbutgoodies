@@ -1,5 +1,6 @@
 package com.hm.oldiesbutgoodies.post.controller;
 
+import com.hm.oldiesbutgoodies.post.service.PostInteractionService;
 import com.hm.oldiesbutgoodies.security.JwtProvider;
 import com.hm.oldiesbutgoodies.post.dto.request.PostSummaryDto;
 import com.hm.oldiesbutgoodies.post.dto.request.PostDto;
@@ -25,6 +26,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final PostInteractionService postInteractionService;
     private final JwtProvider jwtProvider;
 
     @PostMapping(value = "/",
@@ -82,6 +84,28 @@ public class PostController {
         Page<PostSummaryDto> page = postService.listPosts(category, keyword, pageable);
 
         return ResponseEntity.ok(page);
+    }
+
+    @PostMapping(value = "/{postId}/like",
+    produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDto> toggleLike(@RequestHeader("Authorization") String accessToken,
+                                     @PathVariable Long postId) {
+
+        String email = jwtProvider.getUserEmail(accessToken);
+
+        return ResponseEntity.ok(postInteractionService.toggleLike(email, postId));
+
+    }
+
+    @PostMapping(value = "/{postId}/bookmark",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseDto> toggleBookmark(@RequestHeader("Authorization") String accessToken,
+                                                  @PathVariable Long postId) {
+
+        String email = jwtProvider.getUserEmail(accessToken);
+
+        return ResponseEntity.ok(postInteractionService.toggleBookmark(email, postId));
+
     }
 
 
