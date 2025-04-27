@@ -41,9 +41,11 @@ public class CommentController {
     public ResponseEntity<ResponseDto> updateComment(@RequestHeader("Authorization") String accessToken,
                                                      @PathVariable("resource") OwnerType ownerType,
                                                      @PathVariable("resourceId") Long resourceId,
-                                                     @PathVariable("commentId") Long commentId) {
+                                                     @PathVariable("commentId") Long commentId,
+                                                     @RequestBody CommentDto commentDto) {
+        String email = jwtProvider.getUserEmail(accessToken);
 
-        return ResponseEntity.ok(new ResponseDto());
+        return ResponseEntity.ok(commentService.updateComment(email, ownerType, resourceId, commentId, commentDto));
     }
 
     @DeleteMapping("/{commentId}")

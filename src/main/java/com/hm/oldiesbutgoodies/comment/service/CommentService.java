@@ -77,8 +77,6 @@ public class CommentService {
         comment.setDeletedAt(LocalDateTime.now());
 
         String ownerT = ownerType.toString();
-        log.info(ownerT);
-
         commentCount(ownerT, resourceId, -1);
 
         return ResponseDto.setMessage("Comment ID : " + commentId + "댓글이 삭제 처리 됐습니다. ");

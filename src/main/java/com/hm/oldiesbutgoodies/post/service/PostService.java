@@ -110,6 +110,7 @@ public class PostService {
     }
 
     //글 조회(단건 상세)
+    @Transactional(readOnly = true)
     public PostDetailDto getPostById(String email, Long postId) {
         User user = (email != null && !email.isBlank())
                 ? findUserByEmail(email)
@@ -141,9 +142,14 @@ public class PostService {
                 })
                 .toList();
 
-        postRepository.updateViewCount(postId);
+        incrementViewCount(postId);
 
         return PostDetailDto.from(post, urls, comments);
+    }
+
+    @Transactional
+    public void incrementViewCount(Long postId) {
+        postRepository.updateViewCount(postId);
     }
 
     //글 조회(리스트)

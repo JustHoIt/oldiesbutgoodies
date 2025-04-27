@@ -45,6 +45,7 @@ public class PostInteractionService {
         }
     }
 
+    @Transactional
     public ResponseDto toggleBookmark(String email, Long postId) {
         User user = findUserByEmail(email);
         Post post = findPost(postId);
