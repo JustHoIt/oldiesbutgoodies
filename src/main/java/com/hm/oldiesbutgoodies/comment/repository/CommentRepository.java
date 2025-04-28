@@ -24,4 +24,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     void softDeleteByOwner(@Param("ownerType") OwnerType ownerType, @Param("ownerId") Long ownerId);
 
     List<Comment> findAllByOwnerTypeAndOwnerIdAndDeletedFalse(OwnerType ownerType, Long postId);
+
+    List<Comment> findAllByOwnerTypeAndOwnerIdAndParentCommentIsNullAndDeletedFalse(OwnerType ownerType, Long postId);
+
+    List<Comment> findAllByParentCommentIdAndDeletedFalse(Long id);
+
 }

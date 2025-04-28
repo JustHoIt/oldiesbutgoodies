@@ -20,7 +20,8 @@ public class CommentController {
 
     @PostMapping("")
     public ResponseEntity<ResponseDto> createComment(@RequestHeader("Authorization") String accessToken,
-                                                     @PathVariable("resource") OwnerType ownerType, @PathVariable Long resourceId,
+                                                     @PathVariable("resource") OwnerType ownerType,
+                                                     @PathVariable Long resourceId,
                                                      @RequestBody CommentDto commentDto) {
 
         String email = jwtProvider.getUserEmail(accessToken);
@@ -28,14 +29,17 @@ public class CommentController {
         return ResponseEntity.ok(commentService.createComment(email, ownerType, resourceId, commentDto));
     }
 
-    @GetMapping("")
-//    public ResponseEntity<List<CommentResponse>> listComments(
-//            @PathVariable Long postId, @PathVariable String resourceId
-//    ) {
-//        List<CommentResponse> list = commentService.listComments(postId);
-//        return ResponseEntity.ok(list);
-//    }
+    @PostMapping("/{commentId}/replies")
+    public ResponseEntity<ResponseDto> createReply(@RequestHeader("Authorization") String accessToken,
+                                                   @PathVariable("resource") OwnerType ownerType,
+                                                   @PathVariable Long resourceId,
+                                                   @PathVariable Long commentId,
+                                                   @RequestBody CommentDto commentDto) {
 
+        String email = jwtProvider.getUserEmail(accessToken);
+
+        return ResponseEntity.ok(commentService.createReply(email, ownerType, resourceId, commentId, commentDto));
+    }
 
     @PutMapping("/{commentId}")
     public ResponseEntity<ResponseDto> updateComment(@RequestHeader("Authorization") String accessToken,

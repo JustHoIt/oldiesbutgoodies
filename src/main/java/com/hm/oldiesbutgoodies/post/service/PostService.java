@@ -1,5 +1,6 @@
 package com.hm.oldiesbutgoodies.post.service;
 
+import com.hm.oldiesbutgoodies.comment.domain.Comment;
 import com.hm.oldiesbutgoodies.common.domain.ContentImage;
 import com.hm.oldiesbutgoodies.post.domain.PostStatus;
 import com.hm.oldiesbutgoodies.common.domain.OwnerType;
@@ -124,25 +125,36 @@ public class PostService {
                 .map(ContentImage::getUrl)
                 .toList();
 
-        List<CommentResponseDto> comments = commentRepository.findAllByOwnerTypeAndOwnerIdAndDeletedFalse(OwnerType.POST, postId)
-                .stream()
-                .map(comment -> {
-                    UserProfile profile = user.getUserProfile();
+       List<CommentResponseDto> commentTree = buildCommentTree(postId);
 
-                    return CommentResponseDto.builder()
-                            .id(comment.getId())
-                            .content(comment.getContent())
-                            .userId(user.getId())
-                            .userNickname(profile.getNickname())
-                            .userProfileImg(profile.getProfileImg())
-                            .createdAt(comment.getCreatedAt())
-                            .updatedAt(comment.getUpdatedAt())
-                            .build();
+
+        return PostDetailDto.from(post, urls, commentTree);
+    }
+
+    private List<CommentResponseDto> buildCommentTree(Long postId) {
+        // 1) 최상위(부모) 댓글만 조회
+        List<Comment> parents = commentRepository
+                .findAllByOwnerTypeAndOwnerIdAndParentCommentIsNullAndDeletedFalse(
+                        OwnerType.POST, postId);
+
+        // 2) 부모 댓글 DTO 로 변환
+        List<CommentResponseDto> parentDtos = parents.stream()
+                .map(CommentResponseDto::from)
+                .peek(pdto -> {
+                    // 3) 각 부모마다 대댓글 조회
+                    List<Comment> children = commentRepository
+                            .findAllByParentCommentIdAndDeletedFalse(pdto.getId());
+                    // 4) 자식 DTO 로 변환 & 부모 dto 에 세팅
+                    List<CommentResponseDto> childDtos = children.stream()
+                            .map(CommentResponseDto::from)
+                            .toList();
+                    pdto.setComments(childDtos);
                 })
                 .toList();
 
-        return PostDetailDto.from(post, urls, comments);
+        return parentDtos;
     }
+
 
     @Transactional
     public void incrementViewCount(Long postId) {

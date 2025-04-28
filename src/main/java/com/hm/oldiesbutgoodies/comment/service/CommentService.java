@@ -47,6 +47,35 @@ public class CommentService {
         return ResponseDto.setMessage(user.getName() + "님이 댓글을 작성했습니다.");
     }
 
+
+    @Transactional
+    public ResponseDto createReply(String email, OwnerType ownerType, Long resourceId, Long commentId, CommentDto commentDto) {
+        User user = findUserByEmail(email);
+
+        Comment parent = null;
+
+        if (commentId != null) {
+            parent = commentRepository.findByIdAndDeletedFalse(commentId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.COMMENT_NOT_FOUND));
+
+            if (parent.getOwnerType() != ownerType ||
+                    !parent.getOwnerId().equals(resourceId)) {
+                throw new CustomException(ErrorCode.COMMENT_RESOURCE_MISMATCH);
+            }
+        }
+
+        Comment comment = Comment.from(commentDto, ownerType, resourceId, parent);
+        comment.setUser(user);
+        commentRepository.save(comment);
+
+        String ownerT = ownerType.toString();
+        log.info(ownerT);
+
+        commentCount(ownerT, resourceId, +1);
+
+        return ResponseDto.setMessage(user.getName() + "님이 댓글을 작성했습니다.");
+    }
+
     @Transactional
     public ResponseDto updateComment(String email, OwnerType ownerType, Long resourceId, Long commentId, CommentDto commentDto) {
         findOwnerType(ownerType, resourceId);
@@ -83,9 +112,9 @@ public class CommentService {
     }
 
     public void commentCount(String s, long resourceId, int n) {
-        if(s.equals("POST")){
+        if (s.equals("POST")) {
             postRepository.updateCommentCount(resourceId, n);
-        }else {
+        } else {
             productRepository.updateCommentCount(resourceId, n);
         }
     }
@@ -116,13 +145,4 @@ public class CommentService {
         }
     }
 
-    private Post findPost(long postId) {
-        return postRepository.findByIdAndDeletedFalse(postId)
-                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
-    }
-
-    private Product findProduct(long productId) {
-        return productRepository.findByIdAndDeletedFalse(productId)
-                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
-    }
 }

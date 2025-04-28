@@ -9,6 +9,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "comments")
@@ -50,11 +52,31 @@ public class Comment extends BaseTimeEntity {
     private LocalDateTime deletedAt;
 
 
+    /* 대댓글을 위한 부모 댓글 */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parentComment;
+
+    /* 대댓글 목록 */
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> childComments = new ArrayList<>();
+
+    /* 부모 댓글 작성 */
     public static Comment from(CommentDto dto, OwnerType ownerType, Long ownerId) {
         return Comment.builder()
                 .content(dto.getContent())
                 .ownerType(ownerType)
                 .ownerId(ownerId)
+                .build();
+    }
+
+    /* 자식 댓글 작성 */
+    public static Comment from(CommentDto dto, OwnerType ownerType, Long ownerId, Comment parentComment) {
+        return Comment.builder()
+                .content(dto.getContent())
+                .ownerType(ownerType)
+                .ownerId(ownerId)
+                .parentComment(parentComment)
                 .build();
     }
 

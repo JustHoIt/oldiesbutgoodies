@@ -22,7 +22,8 @@ public enum ErrorCode {
     POST_NOT_FOUND(HttpStatus.BAD_REQUEST, "", "게시글이 존재하지 않거나, 잘못된 접근입니다."),
     COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "", "댓글이 존재하지 않거나, 잘못된 접근입니다."),
     FILE_SAVE_FAILED_(HttpStatus.BAD_REQUEST, "", "파일 저장에 실패했습니다."),
-    PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "", "상품이 존재하지 않거나, 잘못된 접근입니다.");
+    PRODUCT_NOT_FOUND(HttpStatus.BAD_REQUEST, "", "상품이 존재하지 않거나, 잘못된 접근입니다."),
+    COMMENT_RESOURCE_MISMATCH(HttpStatus.BAD_REQUEST, "", "부모 댓글과 일치하지 않습니다.");
 
 
     private final HttpStatus status;
