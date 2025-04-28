@@ -68,8 +68,10 @@ public class PostController {
     public ResponseEntity<PostDetailDto> getPostById(@RequestHeader("Authorization") String accessToken,
                                                      @PathVariable Long postId) {
         String email = jwtProvider.getUserEmail(accessToken);
+        PostDetailDto dto = postService.getPostById(email, postId);
+        postService.incrementViewCount(postId);
 
-        return ResponseEntity.ok(postService.getPostById(email, postId));
+        return ResponseEntity.ok(dto);
     }
 
 
