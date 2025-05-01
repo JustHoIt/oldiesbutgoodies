@@ -1,4 +1,4 @@
-package com.hm.oldiesbutgoodies.post.dto.request;
+package com.hm.oldiesbutgoodies.post.dto.response;
 
 import com.hm.oldiesbutgoodies.post.domain.Post;
 import lombok.Builder;

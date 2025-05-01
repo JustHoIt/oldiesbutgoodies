@@ -58,8 +58,8 @@ public class UserController {
 
     @GetMapping(value = "/getUser",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> getUser(@RequestHeader("Authorization") String token) {
-        String email = jwtProvider.getUserEmail(token);
+    public ResponseEntity<UserDto> getUser(@RequestHeader("Authorization") String accessToken) {
+        String email = jwtProvider.getUserEmail(accessToken);
         return ResponseEntity.ok(userService.getUserInfo(email));
     }
 

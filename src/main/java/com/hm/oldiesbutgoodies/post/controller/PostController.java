@@ -2,7 +2,7 @@ package com.hm.oldiesbutgoodies.post.controller;
 
 import com.hm.oldiesbutgoodies.post.service.PostInteractionService;
 import com.hm.oldiesbutgoodies.security.JwtProvider;
-import com.hm.oldiesbutgoodies.post.dto.request.PostSummaryDto;
+import com.hm.oldiesbutgoodies.post.dto.response.PostSummaryDto;
 import com.hm.oldiesbutgoodies.post.dto.request.PostDto;
 import com.hm.oldiesbutgoodies.common.dto.ResponseDto;
 import com.hm.oldiesbutgoodies.post.dto.response.PostDetailDto;

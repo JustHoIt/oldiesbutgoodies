@@ -19,6 +19,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Page<Post> findAllByCategoryAndDeletedFalse(Category category, Pageable pageable);
 
+    Page<Post> findAllByUserIdAndDeletedFalse(Long id, Pageable pageable);
+
     /* 좋아요 수 증감 */
     @Modifying
     @Query("UPDATE Post p SET p.likeCount =  p.likeCount + :delta WHERE p.id = :postId and p.deleted = false")
@@ -38,5 +40,4 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Modifying
     @Query("UPDATE Post p SET p.commentCount = p.commentCount + :delta WHERE p.id = :postId and p.deleted = false")
     void updateCommentCount(@Param("postId") Long postId, @Param("delta") int delta);
-
 }
