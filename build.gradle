@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.3.10'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'
 }
 
 group = 'com.hm'
@@ -12,6 +13,8 @@ java {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
+
+def querydslVersion = '5.0.0'
 
 configurations {
     compileOnly {
@@ -58,11 +61,32 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.5"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.11.5"
 
+    // annotation-processor: Q타입 생성 (JPA 모듈)
+    annotationProcessor 'com.querydsl:querydsl-jpa:5.0.0'
+
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+}
 
+sourceSets {
+    main {
+        java {
+            // generated Querydsl Q파일 경로를 소스 디렉토리로 추가
+            srcDir "$buildDir/generated/sources/querydsl/java"
+        }
+    }
+}
+
+querydsl {
+    jpa = true                      // JPA 어노테이션(Audited 등) 처리
+    querydslSourcesDir = "$buildDir/generated/sources/querydsl/java"
+}
+
+tasks.withType(JavaCompile).configureEach {
+    // annotation-processor 출력 디렉토리 지정 (Gradle 7+ 권장 방식)
+    options.annotationProcessorGeneratedSourcesDirectory = file("$buildDir/generated/sources/querydsl/java")
 }
 
 tasks.named('test') {
