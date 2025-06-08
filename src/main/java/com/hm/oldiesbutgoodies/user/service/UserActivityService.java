@@ -45,13 +45,16 @@ public class UserActivityService {
 
 
         Page<Post> postPage = postRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
-
+        // ✅TODO:
+        return null;
     }
 
     public Page<PostSimpleDto> getMyPostBookmarks(String email, Pageable pageable) {
         User user = findUserByEmail(email);
 
         Page<Post> postPage = postRepository.findAllByUserIdAndDeletedFalse(user.getId(), pageable);
+        // ✅TODO:
+        return null;
     }
 
     private User findUserByEmail(String email) {

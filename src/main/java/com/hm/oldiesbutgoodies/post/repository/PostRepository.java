@@ -1,6 +1,5 @@
 package com.hm.oldiesbutgoodies.post.repository;
 
-import com.hm.oldiesbutgoodies.post.domain.Category;
 import com.hm.oldiesbutgoodies.post.domain.Post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,13 +10,9 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
 
     Optional<Post> findByIdAndDeletedFalse(Long id);
-
-    Page<Post> findAllByDeletedFalse(Pageable pageable);
-
-    Page<Post> findAllByCategoryAndDeletedFalse(Category category, Pageable pageable);
 
     Page<Post> findAllByUserIdAndDeletedFalse(Long id, Pageable pageable);
 

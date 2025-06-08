@@ -1,23 +1,23 @@
 package com.hm.oldiesbutgoodies.post.service;
 
 import com.hm.oldiesbutgoodies.comment.domain.Comment;
-import com.hm.oldiesbutgoodies.common.domain.ContentImage;
-import com.hm.oldiesbutgoodies.post.domain.PostStatus;
-import com.hm.oldiesbutgoodies.common.domain.OwnerType;
-import com.hm.oldiesbutgoodies.post.domain.Category;
-import com.hm.oldiesbutgoodies.post.domain.Post;
-import com.hm.oldiesbutgoodies.common.service.FileStorageService;
 import com.hm.oldiesbutgoodies.comment.dto.response.CommentResponseDto;
-import com.hm.oldiesbutgoodies.post.dto.response.PostDetailDto;
 import com.hm.oldiesbutgoodies.comment.repository.CommentRepository;
-import com.hm.oldiesbutgoodies.user.domain.User;
-import com.hm.oldiesbutgoodies.post.dto.request.PostDto;
-import com.hm.oldiesbutgoodies.post.dto.response.PostSummaryDto;
+import com.hm.oldiesbutgoodies.common.domain.ContentImage;
+import com.hm.oldiesbutgoodies.common.domain.OwnerType;
 import com.hm.oldiesbutgoodies.common.dto.ResponseDto;
 import com.hm.oldiesbutgoodies.common.exception.CustomException;
 import com.hm.oldiesbutgoodies.common.exception.ErrorCode;
 import com.hm.oldiesbutgoodies.common.repository.ContentImageRepository;
+import com.hm.oldiesbutgoodies.common.service.FileStorageService;
+import com.hm.oldiesbutgoodies.post.domain.Post;
+import com.hm.oldiesbutgoodies.post.domain.PostStatus;
+import com.hm.oldiesbutgoodies.post.dto.request.PostDto;
+import com.hm.oldiesbutgoodies.post.dto.request.SearchRequest;
+import com.hm.oldiesbutgoodies.post.dto.response.PostDetailDto;
+import com.hm.oldiesbutgoodies.post.dto.response.PostSummaryDto;
 import com.hm.oldiesbutgoodies.post.repository.PostRepository;
+import com.hm.oldiesbutgoodies.user.domain.User;
 import com.hm.oldiesbutgoodies.user.repository.UserProfileRepository;
 import com.hm.oldiesbutgoodies.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +43,6 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final ContentImageRepository contentImageRepository;
     private final FileStorageService storage;
-
 
     //글 작성
     @Transactional
@@ -124,7 +123,7 @@ public class PostService {
                 .map(ContentImage::getUrl)
                 .toList();
 
-       List<CommentResponseDto> commentTree = buildCommentTree(postId);
+        List<CommentResponseDto> commentTree = buildCommentTree(postId);
 
 
         return PostDetailDto.from(post, urls, commentTree);
@@ -161,21 +160,12 @@ public class PostService {
     }
 
     //글 조회(리스트)
-    public Page<PostSummaryDto> listPosts(String category,
-                                          String keyword,
+    public Page<PostSummaryDto> listPosts(SearchRequest searchRequest,
                                           Pageable pageable) {
-        Category cg = null;
-        if (!isBlank(category)) {
-            cg = Category.valueOf(category.toUpperCase());
-        }
+        // QueryDSL 검색 실행
+        Page<Post> postPage = postRepository.searchByCondition(searchRequest, pageable);
 
-        Page<Post> postPage;
-        if (cg != null && isBlank(keyword)) {
-            postPage = postRepository.findAllByCategoryAndDeletedFalse(cg, pageable);
-        } else {
-            postPage = postRepository.findAllByDeletedFalse(pageable);
-        }
-
+        // DTO 변환
         return postPage.map(post -> {
             String thumb = contentImageRepository
                     .findAllByOwnerTypeAndOwnerIdOrderByPositionAsc(OwnerType.POST, post.getId())

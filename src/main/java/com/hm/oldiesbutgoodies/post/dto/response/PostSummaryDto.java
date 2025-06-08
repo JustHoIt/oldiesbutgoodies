@@ -1,13 +1,15 @@
 package com.hm.oldiesbutgoodies.post.dto.response;
 
 import com.hm.oldiesbutgoodies.post.domain.Post;
-import lombok.Builder;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Setter
 @Builder
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostSummaryDto {
     private Long postId;
     private String title;
