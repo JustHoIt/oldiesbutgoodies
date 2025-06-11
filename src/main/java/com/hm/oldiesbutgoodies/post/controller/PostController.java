@@ -1,14 +1,13 @@
 package com.hm.oldiesbutgoodies.post.controller;
 
-import com.hm.oldiesbutgoodies.post.dto.request.SearchField;
-import com.hm.oldiesbutgoodies.post.dto.request.SearchRequest;
-import com.hm.oldiesbutgoodies.post.service.PostInteractionService;
-import com.hm.oldiesbutgoodies.security.JwtProvider;
-import com.hm.oldiesbutgoodies.post.dto.response.PostSummaryDto;
-import com.hm.oldiesbutgoodies.post.dto.request.PostDto;
 import com.hm.oldiesbutgoodies.common.dto.ResponseDto;
+import com.hm.oldiesbutgoodies.post.dto.request.PostDto;
+import com.hm.oldiesbutgoodies.post.dto.request.SearchRequest;
 import com.hm.oldiesbutgoodies.post.dto.response.PostDetailDto;
+import com.hm.oldiesbutgoodies.post.dto.response.PostSummaryDto;
+import com.hm.oldiesbutgoodies.post.service.PostInteractionService;
 import com.hm.oldiesbutgoodies.post.service.PostService;
+import com.hm.oldiesbutgoodies.security.JwtProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.*;
-import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 
 @RestController
@@ -90,6 +86,7 @@ public class PostController {
         return ResponseEntity.ok(page);
     }
 
+    // 게시글 추천
     @PostMapping(value = "/{postId}/like",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> toggleLike(@RequestHeader("Authorization") String accessToken,
@@ -101,6 +98,7 @@ public class PostController {
 
     }
 
+    // 게시글 저장
     @PostMapping(value = "/{postId}/bookmark",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResponseDto> toggleBookmark(@RequestHeader("Authorization") String accessToken,
